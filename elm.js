@@ -10302,7 +10302,6 @@ Elm.Zone.make = function (_elm) {
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
-   var update = F2(function (action,model) {    return model;});
    var colorToHex = function (color) {
       var _p0 = color;
       switch (_p0.ctor)
@@ -10334,6 +10333,7 @@ Elm.Zone.make = function (_elm) {
              }()
              ,decaying: model.decaying};
    };
+   var update = F2(function (action,model) {    return nextZone(model);});
    return _elm.Zone.values = {_op: _op
                              ,Red: Red
                              ,Yellow: Yellow
@@ -10346,6 +10346,45 @@ Elm.Zone.make = function (_elm) {
                              ,zoneStyle: zoneStyle
                              ,view: view
                              ,update: update};
+};
+Elm.Habit = Elm.Habit || {};
+Elm.Habit.make = function (_elm) {
+   "use strict";
+   _elm.Habit = _elm.Habit || {};
+   if (_elm.Habit.values) return _elm.Habit.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Zone = Elm.Zone.make(_elm);
+   var _op = {};
+   var labelStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "font-family",_1: "Helvetica Neue"}
+                                                   ,{ctor: "_Tuple2",_0: "font-weight",_1: "400"}
+                                                   ,{ctor: "_Tuple2",_0: "font-size",_1: "14px"}
+                                                   ,{ctor: "_Tuple2",_0: "vertical-align",_1: "top"}
+                                                   ,{ctor: "_Tuple2",_0: "line-height",_1: "25px"}
+                                                   ,{ctor: "_Tuple2",_0: "margin-right",_1: "20px"}
+                                                   ,{ctor: "_Tuple2",_0: "text-transform",_1: "uppercase"}]));
+   var update = F2(function (action,model) {    return model;});
+   var view = F2(function (address,model) {
+      return A2($Html.div,
+      _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "margin-top",_1: "25px"},{ctor: "_Tuple2",_0: "margin-left",_1: "25px"}]))]),
+      _U.list([A2($Html.span,_U.list([labelStyle]),_U.list([$Html.text(model.label)]))
+              ,A2($Html.span,_U.list([]),A2($List.map,$Zone.view(address),model.zones))]));
+   });
+   var model = {label: "Meditation"
+               ,zones: _U.list([{color: $Zone.Green,decaying: false}
+                               ,{color: $Zone.Green,decaying: false}
+                               ,{color: $Zone.Yellow,decaying: false}
+                               ,{color: $Zone.Red,decaying: false}])};
+   var Something = {ctor: "Something"};
+   var Model = F2(function (a,b) {    return {label: a,zones: b};});
+   return _elm.Habit.values = {_op: _op,Model: Model,Something: Something,model: model,view: view,update: update,labelStyle: labelStyle};
 };
 Elm.StartApp = Elm.StartApp || {};
 Elm.StartApp.Simple = Elm.StartApp.Simple || {};
@@ -10388,13 +10427,13 @@ Elm.Main.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Debug = Elm.Debug.make(_elm),
+   $Habit = Elm.Habit.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
-   $StartApp$Simple = Elm.StartApp.Simple.make(_elm),
-   $Zone = Elm.Zone.make(_elm);
+   $StartApp$Simple = Elm.StartApp.Simple.make(_elm);
    var _op = {};
-   var main = $StartApp$Simple.start({model: $Zone.model,view: $Zone.view,update: $Zone.update});
+   var main = $StartApp$Simple.start({model: $Habit.model,view: $Habit.view,update: $Habit.update});
    return _elm.Main.values = {_op: _op,main: main};
 };

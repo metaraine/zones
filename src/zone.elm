@@ -45,4 +45,4 @@ view address model =
   span [ onClick address Rotate, zoneStyle model ] []
 
 update : Action -> Model -> Model
-update action model = model
+update action model = nextZone model
