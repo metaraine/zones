@@ -11,18 +11,22 @@ type Action = Something
 
 model : Model
 model = { label = "Meditation", zones = [
-    { color = Zone.Green, decaying = False },
-    { color = Zone.Green, decaying = False },
-    { color = Zone.Yellow, decaying = False },
-    { color = Zone.Red, decaying = False }
+    Zone.Empty,
+    Zone.Empty,
+    Zone.Decaying Zone.Red,
+    Zone.Decaying Zone.Red,
+    Zone.Decaying Zone.Yellow,
+    Zone.Decaying Zone.Yellow,
+    Zone.Decaying Zone.Green,
+    Zone.Active Zone.Green,
+    Zone.Active Zone.Green,
+    Zone.Active Zone.Yellow,
+    Zone.Active Zone.Red
   ]}
 
 view : Signal.Address Zone.Action -> Model -> Html
 view address model =
-  div [ (style [
-      ("margin-top", "25px"),
-      ("margin-left", "25px")
-    ]) ] [
+  div [] [
     span [ labelStyle ] [ text model.label ],
     span [] (List.map (Zone.view address) model.zones)
   ]
@@ -39,8 +43,11 @@ labelStyle = style [
     ("font-family", "Helvetica Neue"),
     ("font-weight", "400"),
     ("font-size", "14px"),
+    ("width", "120px"),
+    ("display", "inline-block"),
     ("vertical-align", "top"),
-    ("line-height", "25px"),
-    ("margin-right", "20px"),
+    ("margin-right", "25px"),
+    ("text-align", "right"),
+    ("line-height", "22px"),
     ("text-transform", "uppercase")
   ]
