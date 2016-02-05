@@ -10682,7 +10682,6 @@ Elm.HabitList.make = function (_elm) {
    $Debug = Elm.Debug.make(_elm),
    $Habit = Elm.Habit.make(_elm),
    $Html = Elm.Html.make(_elm),
-   $Html$Attributes = Elm.Html.Attributes.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
@@ -10690,27 +10689,20 @@ Elm.HabitList.make = function (_elm) {
    $Zone = Elm.Zone.make(_elm);
    var _op = {};
    var update = F2(function (action,model) {    return model;});
-   var view = F2(function (address,model) {
-      return A2($Html.div,
-      _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "margin-top",_1: "25px"},{ctor: "_Tuple2",_0: "margin-left",_1: "25px"}]))]),
-      _U.list([A2($Html.div,_U.list([]),A2($List.map,$Habit.view(address),model))]));
-   });
+   var view = F2(function (address,model) {    return A2($Html.div,_U.list([]),A2($List.map,$Habit.view(address),model));});
    var model = _U.list([{label: "Sleep"
                         ,zones: _U.list([$Zone.Empty
                                         ,$Zone.Active($Zone.Red)
                                         ,$Zone.Active($Zone.Yellow)
                                         ,$Zone.Active($Zone.Green)
                                         ,$Zone.Active($Zone.Green)
-                                        ,$Zone.Decaying($Zone.Green)
-                                        ,$Zone.Decaying($Zone.Yellow)
-                                        ,$Zone.Decaying($Zone.Red)])}
+                                        ,$Zone.Decaying($Zone.Green)])}
                        ,{label: "Diet"
                         ,zones: _U.list([$Zone.Active($Zone.Red)
                                         ,$Zone.Active($Zone.Red)
                                         ,$Zone.Active($Zone.Yellow)
                                         ,$Zone.Active($Zone.Yellow)
                                         ,$Zone.Active($Zone.Green)
-                                        ,$Zone.Decaying($Zone.Green)
                                         ,$Zone.Decaying($Zone.Yellow)])}
                        ,{label: "Meditation"
                         ,zones: _U.list([$Zone.Empty
@@ -10718,20 +10710,407 @@ Elm.HabitList.make = function (_elm) {
                                         ,$Zone.Active($Zone.Yellow)
                                         ,$Zone.Active($Zone.Green)
                                         ,$Zone.Active($Zone.Green)
-                                        ,$Zone.Decaying($Zone.Green)
-                                        ,$Zone.Decaying($Zone.Yellow)
-                                        ,$Zone.Decaying($Zone.Yellow)
-                                        ,$Zone.Decaying($Zone.Red)
-                                        ,$Zone.Decaying($Zone.Red)])}
+                                        ,$Zone.Decaying($Zone.Yellow)])}
                        ,{label: "Exercise"
                         ,zones: _U.list([$Zone.Active($Zone.Green)
                                         ,$Zone.Active($Zone.Green)
                                         ,$Zone.Active($Zone.Green)
                                         ,$Zone.Active($Zone.Yellow)
                                         ,$Zone.Active($Zone.Yellow)
-                                        ,$Zone.Decaying($Zone.Red)
                                         ,$Zone.Decaying($Zone.Red)])}]);
    return _elm.HabitList.values = {_op: _op,model: model,view: view,update: update};
+};
+Elm.Date = Elm.Date || {};
+Elm.Date.Core = Elm.Date.Core || {};
+Elm.Date.Core.make = function (_elm) {
+   "use strict";
+   _elm.Date = _elm.Date || {};
+   _elm.Date.Core = _elm.Date.Core || {};
+   if (_elm.Date.Core.values) return _elm.Date.Core.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Date = Elm.Date.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Time = Elm.Time.make(_elm);
+   var _op = {};
+   var prevMonth = function (month) {
+      var _p0 = month;
+      switch (_p0.ctor)
+      {case "Jan": return $Date.Dec;
+         case "Feb": return $Date.Jan;
+         case "Mar": return $Date.Feb;
+         case "Apr": return $Date.Mar;
+         case "May": return $Date.Apr;
+         case "Jun": return $Date.May;
+         case "Jul": return $Date.Jun;
+         case "Aug": return $Date.Jul;
+         case "Sep": return $Date.Aug;
+         case "Oct": return $Date.Sep;
+         case "Nov": return $Date.Oct;
+         default: return $Date.Nov;}
+   };
+   var nextMonth = function (month) {
+      var _p1 = month;
+      switch (_p1.ctor)
+      {case "Jan": return $Date.Feb;
+         case "Feb": return $Date.Mar;
+         case "Mar": return $Date.Apr;
+         case "Apr": return $Date.May;
+         case "May": return $Date.Jun;
+         case "Jun": return $Date.Jul;
+         case "Jul": return $Date.Aug;
+         case "Aug": return $Date.Sep;
+         case "Sep": return $Date.Oct;
+         case "Oct": return $Date.Nov;
+         case "Nov": return $Date.Dec;
+         default: return $Date.Jan;}
+   };
+   var monthToInt = function (month) {
+      var _p2 = month;
+      switch (_p2.ctor)
+      {case "Jan": return 1;
+         case "Feb": return 2;
+         case "Mar": return 3;
+         case "Apr": return 4;
+         case "May": return 5;
+         case "Jun": return 6;
+         case "Jul": return 7;
+         case "Aug": return 8;
+         case "Sep": return 9;
+         case "Oct": return 10;
+         case "Nov": return 11;
+         default: return 12;}
+   };
+   var isLeapYear = function (year) {
+      return _U.eq(A2($Basics._op["%"],year,4),0) && !_U.eq(A2($Basics._op["%"],year,100),0) || _U.eq(A2($Basics._op["%"],year,400),0);
+   };
+   var isLeapYearDate = function (date) {    return isLeapYear($Date.year(date));};
+   var yearToDayLength = function (year) {    return isLeapYear(year) ? 366 : 365;};
+   var daysInMonth = F2(function (year,month) {
+      var _p3 = month;
+      switch (_p3.ctor)
+      {case "Jan": return 31;
+         case "Feb": return isLeapYear(year) ? 29 : 28;
+         case "Mar": return 31;
+         case "Apr": return 30;
+         case "May": return 31;
+         case "Jun": return 30;
+         case "Jul": return 31;
+         case "Aug": return 31;
+         case "Sep": return 30;
+         case "Oct": return 31;
+         case "Nov": return 30;
+         default: return 31;}
+   });
+   var daysInMonthDate = function (date) {    return A2(daysInMonth,$Date.year(date),$Date.month(date));};
+   var monthList = _U.list([$Date.Jan,$Date.Feb,$Date.Mar,$Date.Apr,$Date.May,$Date.Jun,$Date.Jul,$Date.Aug,$Date.Sep,$Date.Oct,$Date.Nov,$Date.Dec]);
+   var toTime = function (_p4) {    return $Basics.floor($Date.toTime(_p4));};
+   var fromTime = function (_p5) {    return $Date.fromTime($Basics.toFloat(_p5));};
+   var prevDay = function (day) {
+      var _p6 = day;
+      switch (_p6.ctor)
+      {case "Mon": return $Date.Sun;
+         case "Tue": return $Date.Mon;
+         case "Wed": return $Date.Tue;
+         case "Thu": return $Date.Wed;
+         case "Fri": return $Date.Thu;
+         case "Sat": return $Date.Fri;
+         default: return $Date.Sat;}
+   };
+   var nextDay = function (day) {
+      var _p7 = day;
+      switch (_p7.ctor)
+      {case "Mon": return $Date.Tue;
+         case "Tue": return $Date.Wed;
+         case "Wed": return $Date.Thu;
+         case "Thu": return $Date.Fri;
+         case "Fri": return $Date.Sat;
+         case "Sat": return $Date.Sun;
+         default: return $Date.Mon;}
+   };
+   var isoDayOfWeek = function (day) {
+      var _p8 = day;
+      switch (_p8.ctor)
+      {case "Mon": return 1;
+         case "Tue": return 2;
+         case "Wed": return 3;
+         case "Thu": return 4;
+         case "Fri": return 5;
+         case "Sat": return 6;
+         default: return 7;}
+   };
+   var daysBackToStartOfWeek = F2(function (dateDay,startOfWeekDay) {
+      var startOfWeekDayIndex = isoDayOfWeek(startOfWeekDay);
+      var dateDayIndex = isoDayOfWeek(dateDay);
+      return _U.cmp(dateDayIndex,startOfWeekDayIndex) < 0 ? 7 + dateDayIndex - startOfWeekDayIndex : dateDayIndex - startOfWeekDayIndex;
+   });
+   var ticksAMillisecond = $Basics.floor($Time.millisecond);
+   var ticksASecond = ticksAMillisecond * 1000;
+   var ticksAMinute = ticksASecond * 60;
+   var ticksAnHour = ticksAMinute * 60;
+   var ticksADay = ticksAnHour * 24;
+   var ticksAWeek = ticksADay * 7;
+   var firstOfMonthTicks = function (date) {    var dateTicks = toTime(date);var day = $Date.day(date);return dateTicks + (1 - day) * ticksADay;};
+   var lastOfPrevMonthDate = function (date) {    return fromTime(firstOfMonthTicks(date) - ticksADay);};
+   var daysInPrevMonth = function (date) {    return daysInMonthDate(lastOfPrevMonthDate(date));};
+   var toFirstOfMonth = function (date) {    return fromTime(firstOfMonthTicks(date));};
+   var lastOfMonthTicks = function (date) {
+      var dateTicks = toTime(date);
+      var day = $Date.day(date);
+      var month = $Date.month(date);
+      var year = $Date.year(date);
+      var daysInMonthVal = A2(daysInMonth,year,month);
+      var addDays = daysInMonthVal - day;
+      return dateTicks + addDays * ticksADay;
+   };
+   var firstOfNextMonthDate = function (date) {    return fromTime(lastOfMonthTicks(date) + ticksADay);};
+   var daysInNextMonth = function (date) {    return daysInMonthDate(firstOfNextMonthDate(date));};
+   var lastOfMonthDate = function (date) {    return fromTime(lastOfMonthTicks(date));};
+   var epochDateStr = "1970-01-01T00:00:00Z";
+   return _elm.Date.Core.values = {_op: _op
+                                  ,monthToInt: monthToInt
+                                  ,daysInMonth: daysInMonth
+                                  ,monthList: monthList
+                                  ,daysInNextMonth: daysInNextMonth
+                                  ,daysInPrevMonth: daysInPrevMonth
+                                  ,daysInMonthDate: daysInMonthDate
+                                  ,isLeapYear: isLeapYear
+                                  ,isLeapYearDate: isLeapYearDate
+                                  ,yearToDayLength: yearToDayLength
+                                  ,isoDayOfWeek: isoDayOfWeek
+                                  ,toFirstOfMonth: toFirstOfMonth
+                                  ,firstOfNextMonthDate: firstOfNextMonthDate
+                                  ,lastOfMonthDate: lastOfMonthDate
+                                  ,lastOfPrevMonthDate: lastOfPrevMonthDate
+                                  ,daysBackToStartOfWeek: daysBackToStartOfWeek
+                                  ,fromTime: fromTime
+                                  ,toTime: toTime
+                                  ,nextDay: nextDay
+                                  ,prevDay: prevDay
+                                  ,nextMonth: nextMonth
+                                  ,prevMonth: prevMonth
+                                  ,epochDateStr: epochDateStr
+                                  ,ticksAMillisecond: ticksAMillisecond
+                                  ,ticksASecond: ticksASecond
+                                  ,ticksAMinute: ticksAMinute
+                                  ,ticksAnHour: ticksAnHour
+                                  ,ticksADay: ticksADay
+                                  ,ticksAWeek: ticksAWeek};
+};
+Elm.Date = Elm.Date || {};
+Elm.Date.Period = Elm.Date.Period || {};
+Elm.Date.Period.make = function (_elm) {
+   "use strict";
+   _elm.Date = _elm.Date || {};
+   _elm.Date.Period = _elm.Date.Period || {};
+   if (_elm.Date.Period.values) return _elm.Date.Period.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Date = Elm.Date.make(_elm),
+   $Date$Core = Elm.Date.Core.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var addTimeUnit = F3(function (unit,addend,date) {
+      return $Date$Core.fromTime(A2(F2(function (x,y) {    return x + y;}),addend * unit,$Date$Core.toTime(date)));
+   });
+   var toTicks = function (period) {
+      var _p0 = period;
+      switch (_p0.ctor)
+      {case "Millisecond": return $Date$Core.ticksAMillisecond;
+         case "Second": return $Date$Core.ticksASecond;
+         case "Minute": return $Date$Core.ticksAMinute;
+         case "Hour": return $Date$Core.ticksAnHour;
+         case "Day": return $Date$Core.ticksADay;
+         case "Week": return $Date$Core.ticksAWeek;
+         default: var _p1 = _p0._0;
+           return $Date$Core.ticksAMillisecond * _p1.millisecond + $Date$Core.ticksASecond * _p1.second + $Date$Core.ticksAMinute * _p1.minute + $Date$Core.ticksAnHour * _p1.hour + $Date$Core.ticksADay * _p1.day + $Date$Core.ticksAWeek * _p1.week;}
+   };
+   var add = function (period) {    return addTimeUnit(toTicks(period));};
+   var zeroDelta = {week: 0,day: 0,hour: 0,minute: 0,second: 0,millisecond: 0};
+   var DeltaRecord = F6(function (a,b,c,d,e,f) {    return {week: a,day: b,hour: c,minute: d,second: e,millisecond: f};});
+   var Delta = function (a) {    return {ctor: "Delta",_0: a};};
+   var diff = F2(function (date1,date2) {
+      var millisecondDiff = $Date.millisecond(date1) - $Date.millisecond(date2);
+      var secondDiff = $Date.second(date1) - $Date.second(date2);
+      var minuteDiff = $Date.minute(date1) - $Date.minute(date2);
+      var hourDiff = $Date.hour(date1) - $Date.hour(date2);
+      var ticksDiff = $Date$Core.toTime(date1) - $Date$Core.toTime(date2);
+      var ticksDayDiff = ticksDiff - hourDiff * $Date$Core.ticksAnHour - minuteDiff * $Date$Core.ticksAMinute - secondDiff * $Date$Core.ticksASecond - millisecondDiff * $Date$Core.ticksAMillisecond;
+      var onlylDaysDiff = ticksDayDiff / $Date$Core.ticksADay | 0;
+      var _p2 = function () {
+         if (_U.cmp(onlylDaysDiff,0) < 0) {
+               var absDayDiff = $Basics.abs(onlylDaysDiff);
+               return {ctor: "_Tuple2",_0: $Basics.negate(absDayDiff / 7 | 0),_1: $Basics.negate(A2($Basics._op["%"],absDayDiff,7))};
+            } else return {ctor: "_Tuple2",_0: onlylDaysDiff / 7 | 0,_1: A2($Basics._op["%"],onlylDaysDiff,7)};
+      }();
+      var weekDiff = _p2._0;
+      var dayDiff = _p2._1;
+      return Delta({week: weekDiff,day: dayDiff,hour: hourDiff,minute: minuteDiff,second: secondDiff,millisecond: millisecondDiff});
+   });
+   var Week = {ctor: "Week"};
+   var Day = {ctor: "Day"};
+   var Hour = {ctor: "Hour"};
+   var Minute = {ctor: "Minute"};
+   var Second = {ctor: "Second"};
+   var Millisecond = {ctor: "Millisecond"};
+   return _elm.Date.Period.values = {_op: _op
+                                    ,add: add
+                                    ,zeroDelta: zeroDelta
+                                    ,diff: diff
+                                    ,DeltaRecord: DeltaRecord
+                                    ,Millisecond: Millisecond
+                                    ,Second: Second
+                                    ,Minute: Minute
+                                    ,Hour: Hour
+                                    ,Day: Day
+                                    ,Week: Week
+                                    ,Delta: Delta};
+};
+Elm.HabitChart = Elm.HabitChart || {};
+Elm.HabitChart.make = function (_elm) {
+   "use strict";
+   _elm.HabitChart = _elm.HabitChart || {};
+   if (_elm.HabitChart.values) return _elm.HabitChart.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Date = Elm.Date.make(_elm),
+   $Date$Period = Elm.Date.Period.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $HabitList = Elm.HabitList.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $String = Elm.String.make(_elm),
+   $Time = Elm.Time.make(_elm);
+   var _op = {};
+   var headerCellLightStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "font-family",_1: "Helvetica Neue"}
+                                                             ,{ctor: "_Tuple2",_0: "font-weight",_1: "400"}
+                                                             ,{ctor: "_Tuple2",_0: "font-size",_1: "12px"}
+                                                             ,{ctor: "_Tuple2",_0: "display",_1: "inline-block"}
+                                                             ,{ctor: "_Tuple2",_0: "width",_1: "20px"}
+                                                             ,{ctor: "_Tuple2",_0: "height",_1: "20px"}
+                                                             ,{ctor: "_Tuple2",_0: "text-align",_1: "center"}
+                                                             ,{ctor: "_Tuple2",_0: "color",_1: "hsl(0, 0%, 80%)"}]));
+   var headerCellStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "font-family",_1: "Helvetica Neue"}
+                                                        ,{ctor: "_Tuple2",_0: "font-weight",_1: "400"}
+                                                        ,{ctor: "_Tuple2",_0: "font-size",_1: "12px"}
+                                                        ,{ctor: "_Tuple2",_0: "display",_1: "inline-block"}
+                                                        ,{ctor: "_Tuple2",_0: "width",_1: "20px"}
+                                                        ,{ctor: "_Tuple2",_0: "height",_1: "20px"}
+                                                        ,{ctor: "_Tuple2",_0: "text-align",_1: "center"}]));
+   var labelStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "font-family",_1: "Helvetica Neue"}
+                                                   ,{ctor: "_Tuple2",_0: "font-weight",_1: "400"}
+                                                   ,{ctor: "_Tuple2",_0: "font-size",_1: "14px"}
+                                                   ,{ctor: "_Tuple2",_0: "width",_1: "120px"}
+                                                   ,{ctor: "_Tuple2",_0: "display",_1: "inline-block"}
+                                                   ,{ctor: "_Tuple2",_0: "vertical-align",_1: "top"}
+                                                   ,{ctor: "_Tuple2",_0: "margin-right",_1: "25px"}
+                                                   ,{ctor: "_Tuple2",_0: "text-align",_1: "right"}
+                                                   ,{ctor: "_Tuple2",_0: "line-height",_1: "22px"}
+                                                   ,{ctor: "_Tuple2",_0: "text-transform",_1: "uppercase"}]));
+   var showFullMonth = function (date) {
+      var _p0 = $Date.month(date);
+      switch (_p0.ctor)
+      {case "Jan": return "January";
+         case "Feb": return "February";
+         case "Mar": return "March";
+         case "Apr": return "April";
+         case "May": return "May";
+         case "Jun": return "June";
+         case "Jul": return "July";
+         case "Aug": return "August";
+         case "Sep": return "September";
+         case "Oct": return "October";
+         case "Nov": return "November";
+         default: return "December";}
+   };
+   var showDate = function (date) {
+      return A2($Basics._op["++"],
+      $Basics.toString($Date.month(date)),
+      A2($Basics._op["++"],
+      " ",
+      A2($Basics._op["++"],
+      $Basics.toString($Date.day(date)),
+      A2($Basics._op["++"],
+      ", ",
+      A2($Basics._op["++"],
+      $Basics.toString($Date.year(date)),
+      A2($Basics._op["++"],
+      "  ",
+      A2($Basics._op["++"],
+      $Basics.toString($Date.hour(date)),
+      A2($Basics._op["++"],
+      ":",
+      A2($Basics._op["++"],$Basics.toString($Date.minute(date)),A2($Basics._op["++"],":",$Basics.toString($Date.second(date))))))))))));
+   };
+   var update = F2(function (action,model) {
+      var _p1 = action;
+      if (_p1.ctor === "NoOp") {
+            return model;
+         } else {
+            return _U.update(model,{date: _p1._0});
+         }
+   });
+   var viewHeaderCell = function (date) {    return A2($Html.span,_U.list([headerCellStyle]),_U.list([$Html.text($Basics.toString($Date.day(date)))]));};
+   var viewHeaderDayCell = function (date) {
+      return A2($Html.span,_U.list([headerCellLightStyle]),_U.list([$Html.text(A2($String.left,2,$Basics.toString($Date.dayOfWeek(date))))]));
+   };
+   var viewHeaderMonthCell = function (date) {
+      return A2($Html.span,_U.list([headerCellStyle]),_U.list([$Html.text(_U.eq($Date.day(date),1) ? showFullMonth(date) : "")]));
+   };
+   var listOfDates = F2(function (date,days) {
+      return A2($List.map,function (n) {    return A3($Date$Period.add,$Date$Period.Day,0 - n,date);},$List.reverse(_U.range(0,days - 1)));
+   });
+   var viewHeaderRow = F3(function (date,days,viewCell) {
+      return A2($Html.div,
+      _U.list([]),
+      _U.list([A2($Html.span,_U.list([labelStyle]),_U.list([])),A2($Html.span,_U.list([]),A2($List.map,viewCell,A2(listOfDates,date,days)))]));
+   });
+   var startModel = {habitList: $HabitList.model,date: $Date.fromTime(0),daysToShow: 6};
+   var Update = function (a) {    return {ctor: "Update",_0: a};};
+   var clock = A2($Signal.map,function (_p2) {    return Update($Date.fromTime(_p2));},$Time.every($Time.second));
+   var NoOp = {ctor: "NoOp"};
+   var actions = $Signal.mailbox(NoOp);
+   var model = A3($Signal.foldp,update,startModel,A2($Signal.merge,actions.signal,clock));
+   var view = F2(function (address,model) {
+      return A2($Html.div,
+      _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "margin-top",_1: "25px"},{ctor: "_Tuple2",_0: "margin-left",_1: "25px"}]))]),
+      _U.list([A3(viewHeaderRow,model.date,model.daysToShow,viewHeaderDayCell)
+              ,A3(viewHeaderRow,model.date,model.daysToShow,viewHeaderCell)
+              ,A2($HabitList.view,A2($Signal.forwardTo,address,$Basics.always(NoOp)),model.habitList)]));
+   });
+   var Model = F3(function (a,b,c) {    return {habitList: a,date: b,daysToShow: c};});
+   return _elm.HabitChart.values = {_op: _op
+                                   ,Model: Model
+                                   ,NoOp: NoOp
+                                   ,Update: Update
+                                   ,startModel: startModel
+                                   ,actions: actions
+                                   ,model: model
+                                   ,clock: clock
+                                   ,view: view
+                                   ,listOfDates: listOfDates
+                                   ,viewHeaderRow: viewHeaderRow
+                                   ,viewHeaderMonthCell: viewHeaderMonthCell
+                                   ,viewHeaderDayCell: viewHeaderDayCell
+                                   ,viewHeaderCell: viewHeaderCell
+                                   ,update: update
+                                   ,showDate: showDate
+                                   ,showFullMonth: showFullMonth
+                                   ,labelStyle: labelStyle
+                                   ,headerCellStyle: headerCellStyle
+                                   ,headerCellLightStyle: headerCellLightStyle};
 };
 Elm.StartApp = Elm.StartApp || {};
 Elm.StartApp.Simple = Elm.StartApp.Simple || {};
@@ -10773,66 +11152,18 @@ Elm.Main.make = function (_elm) {
    if (_elm.Main.values) return _elm.Main.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
-   $Date = Elm.Date.make(_elm),
    $Debug = Elm.Debug.make(_elm),
-   $HabitList = Elm.HabitList.make(_elm),
+   $HabitChart = Elm.HabitChart.make(_elm),
    $Html = Elm.Html.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $Time = Elm.Time.make(_elm);
+   $Signal = Elm.Signal.make(_elm);
    var _op = {};
-   var update = F2(function (action,model) {
-      var _p0 = action;
-      if (_p0.ctor === "NoOp") {
-            return model;
-         } else {
-            return _U.update(model,{time: _p0._0});
-         }
-   });
-   var showDate = function (date) {
-      return A2($Basics._op["++"],
-      $Basics.toString($Date.month(date)),
-      A2($Basics._op["++"],
-      " ",
-      A2($Basics._op["++"],
-      $Basics.toString($Date.day(date)),
-      A2($Basics._op["++"],
-      ", ",
-      A2($Basics._op["++"],
-      $Basics.toString($Date.year(date)),
-      A2($Basics._op["++"],
-      "  ",
-      A2($Basics._op["++"],
-      $Basics.toString($Date.hour(date)),
-      A2($Basics._op["++"],
-      ":",
-      A2($Basics._op["++"],$Basics.toString($Date.minute(date)),A2($Basics._op["++"],":",$Basics.toString($Date.second(date))))))))))));
-   };
-   var Model = F2(function (a,b) {    return {habitList: a,time: b};});
-   var Update = function (a) {    return {ctor: "Update",_0: a};};
-   var clock = A2($Signal.map,Update,$Time.every($Time.second));
+   var model = $HabitChart.model;
    var NoOp = {ctor: "NoOp"};
    var actions = $Signal.mailbox(NoOp);
-   var view = F2(function (address,model) {
-      return A2($Html.div,
-      _U.list([]),
-      _U.list([$Html.text(showDate($Date.fromTime(model.time))),A2($HabitList.view,A2($Signal.forwardTo,address,$Basics.always(NoOp)),model.habitList)]));
-   });
-   var startTime = 0;
-   var model = A3($Signal.foldp,update,{habitList: $HabitList.model,time: startTime},A2($Signal.merge,actions.signal,clock));
+   var view = F2(function (address,model) {    return A2($HabitChart.view,A2($Signal.forwardTo,address,$Basics.always(NoOp)),model);});
    var main = A2($Signal.map,view(actions.address),model);
-   return _elm.Main.values = {_op: _op
-                             ,startTime: startTime
-                             ,NoOp: NoOp
-                             ,Update: Update
-                             ,Model: Model
-                             ,showDate: showDate
-                             ,actions: actions
-                             ,update: update
-                             ,model: model
-                             ,clock: clock
-                             ,main: main
-                             ,view: view};
+   return _elm.Main.values = {_op: _op,NoOp: NoOp,model: model,actions: actions,main: main,view: view};
 };

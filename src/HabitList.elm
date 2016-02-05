@@ -18,9 +18,7 @@ model = [
         Zone.Active Zone.Yellow,
         Zone.Active Zone.Green,
         Zone.Active Zone.Green,
-        Zone.Decaying Zone.Green,
-        Zone.Decaying Zone.Yellow,
-        Zone.Decaying Zone.Red
+        Zone.Decaying Zone.Green
       ]
     },
     {
@@ -31,7 +29,6 @@ model = [
         Zone.Active Zone.Yellow,
         Zone.Active Zone.Yellow,
         Zone.Active Zone.Green,
-        Zone.Decaying Zone.Green,
         Zone.Decaying Zone.Yellow
       ]
     },
@@ -43,11 +40,7 @@ model = [
         Zone.Active Zone.Yellow,
         Zone.Active Zone.Green,
         Zone.Active Zone.Green,
-        Zone.Decaying Zone.Green,
-        Zone.Decaying Zone.Yellow,
-        Zone.Decaying Zone.Yellow,
-        Zone.Decaying Zone.Red,
-        Zone.Decaying Zone.Red
+        Zone.Decaying Zone.Yellow
       ]
     },
     {
@@ -58,7 +51,6 @@ model = [
         Zone.Active Zone.Green,
         Zone.Active Zone.Yellow,
         Zone.Active Zone.Yellow,
-        Zone.Decaying Zone.Red,
         Zone.Decaying Zone.Red
       ]
     }
@@ -66,12 +58,7 @@ model = [
 
 view : Signal.Address Zone.Action -> Model -> Html
 view address model =
-  div [ (style [
-      ("margin-top", "25px"),
-      ("margin-left", "25px")
-    ]) ] [
-    div [] (List.map (Habit.view address) model)
-  ]
+  div [] (List.map (Habit.view address) model)
 
 update : Zone.Action -> Model -> Model
 update action model = model
