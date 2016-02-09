@@ -10974,6 +10974,69 @@ Elm.Date.Period.make = function (_elm) {
                                     ,Week: Week
                                     ,Delta: Delta};
 };
+Elm.Date = Elm.Date || {};
+Elm.Date.Compare = Elm.Date.Compare || {};
+Elm.Date.Compare.make = function (_elm) {
+   "use strict";
+   _elm.Date = _elm.Date || {};
+   _elm.Date.Compare = _elm.Date.Compare || {};
+   if (_elm.Date.Compare.values) return _elm.Date.Compare.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Date = Elm.Date.make(_elm),
+   $Date$Core = Elm.Date.Core.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var is3 = F4(function (comp,date1,date2,date3) {
+      var time3 = $Date$Core.toTime(date3);
+      var time2 = $Date$Core.toTime(date2);
+      var highBound = A2($Basics.max,time2,time3);
+      var lowBound = A2($Basics.min,time2,time3);
+      var time1 = $Date$Core.toTime(date1);
+      var _p0 = comp;
+      switch (_p0.ctor)
+      {case "Between": return _U.cmp(time1,lowBound) > 0 && _U.cmp(time1,highBound) < 0;
+         case "BetweenOpenStart": return _U.cmp(time1,lowBound) > -1 && _U.cmp(time1,highBound) < 0;
+         case "BetweenOpenEnd": return _U.cmp(time1,lowBound) > 0 && _U.cmp(time1,highBound) < 1;
+         default: return _U.cmp(time1,lowBound) > -1 && _U.cmp(time1,highBound) < 1;}
+   });
+   var is = F3(function (comp,date1,date2) {
+      var time2 = $Date$Core.toTime(date2);
+      var time1 = $Date$Core.toTime(date1);
+      var _p1 = comp;
+      switch (_p1.ctor)
+      {case "Before": return _U.cmp(time1,time2) < 0;
+         case "After": return _U.cmp(time1,time2) > 0;
+         case "Same": return _U.eq(time1,time2);
+         case "SameOrBefore": return _U.cmp(time1,time2) < 1;
+         default: return _U.cmp(time1,time2) > -1;}
+   });
+   var BetweenOpen = {ctor: "BetweenOpen"};
+   var BetweenOpenEnd = {ctor: "BetweenOpenEnd"};
+   var BetweenOpenStart = {ctor: "BetweenOpenStart"};
+   var Between = {ctor: "Between"};
+   var SameOrBefore = {ctor: "SameOrBefore"};
+   var SameOrAfter = {ctor: "SameOrAfter"};
+   var Same = {ctor: "Same"};
+   var Before = {ctor: "Before"};
+   var After = {ctor: "After"};
+   return _elm.Date.Compare.values = {_op: _op
+                                     ,is: is
+                                     ,is3: is3
+                                     ,After: After
+                                     ,Before: Before
+                                     ,Same: Same
+                                     ,SameOrAfter: SameOrAfter
+                                     ,SameOrBefore: SameOrBefore
+                                     ,Between: Between
+                                     ,BetweenOpenStart: BetweenOpenStart
+                                     ,BetweenOpenEnd: BetweenOpenEnd
+                                     ,BetweenOpen: BetweenOpen};
+};
 Elm.HabitChart = Elm.HabitChart || {};
 Elm.HabitChart.make = function (_elm) {
    "use strict";
@@ -10982,6 +11045,7 @@ Elm.HabitChart.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Date = Elm.Date.make(_elm),
+   $Date$Compare = Elm.Date.Compare.make(_elm),
    $Date$Period = Elm.Date.Period.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Habit = Elm.Habit.make(_elm),
@@ -11077,47 +11141,60 @@ Elm.HabitChart.make = function (_elm) {
    var listOfDates = F2(function (date,days) {
       return A2($List.map,function (n) {    return A3($Date$Period.add,$Date$Period.Day,0 - n,date);},$List.reverse(_U.range(0,days - 1)));
    });
+   var decayZone = F3(function (decayRate,decay,color) {
+      var _p2 = color;
+      switch (_p2.ctor)
+      {case "Green": return _U.cmp(decay,decayRate) < 0 ? $Zone.Active($Zone.Green) : $Zone.Active($Zone.Yellow);
+         case "Yellow": return _U.cmp(decay,decayRate) < 0 ? $Zone.Active($Zone.Yellow) : $Zone.Active($Zone.Red);
+         default: return $Zone.Active($Zone.Red);}
+   });
    var dateEquals = F2(function (date1,date2) {
       return _U.eq($Date.year(date1),$Date.year(date2)) && (_U.eq($Date.month(date1),$Date.month(date2)) && _U.eq($Date.day(date1),$Date.day(date2)));
    });
    var toHabitList = F2(function (dates,habitRecords) {
-      var findZone = F2(function (checkins,date) {
-         var searchCheckin = $List.head(A2($List.filter,function (_p2) {    return A2(dateEquals,date,function (_) {    return _.date;}(_p2));},checkins));
-         var _p3 = searchCheckin;
-         if (_p3.ctor === "Just") {
-               return $Zone.Active(_p3._0.color);
+      var firstDate = function () {    var _p3 = $List.head(dates);if (_p3.ctor === "Just") {    return _p3._0;} else {    return $Date.fromTime(0);}}();
+      var findZone = F4(function (checkins,decayRate,decay,date) {
+         var searchCheckin = $List.head(A2($List.filter,function (_p4) {    return A2(dateEquals,date,function (_) {    return _.date;}(_p4));},checkins));
+         var _p5 = searchCheckin;
+         if (_p5.ctor === "Just") {
+               return $Zone.Active(_p5._0.color);
             } else {
-               return $Zone.Empty;
+               if (A3($Date$Compare.is,$Date$Compare.SameOrAfter,date,firstDate)) {
+                     var _p6 = A4(findZone,checkins,decayRate,decay + 1,A3($Date$Period.add,$Date$Period.Day,-1,date));
+                     switch (_p6.ctor)
+                     {case "Active": return A3(decayZone,decayRate,decay,_p6._0);
+                        case "Decaying": return A3(decayZone,decayRate,decay,_p6._0);
+                        default: return $Zone.Empty;}
+                  } else return $Zone.Empty;
             }
       });
-      var toHabit = function (_p4) {    var _p5 = _p4;return {label: _p5.label,zones: A2($List.map,findZone(_p5.checkins),dates)};};
+      var toHabit = function (_p7) {    var _p8 = _p7;return {label: _p8.label,zones: A2($List.map,A3(findZone,_p8.checkins,_p8.decayRate,0),dates)};};
       return A2($List.map,toHabit,habitRecords);
    });
+   var constDate = function (str) {    return A2($Result.withDefault,$Date.fromTime(0),$Date.fromString(str));};
    var startModel = {habitRecords: _U.list([{label: "Sleep"
-                                            ,checkins: _U.list([{date: A2($Result.withDefault,$Date.fromTime(0),$Date.fromString("2016-02-04 00:00:00"))
-                                                                ,color: $Zone.Red}
-                                                               ,{date: A2($Result.withDefault,$Date.fromTime(0),$Date.fromString("2016-02-06 00:00:00"))
-                                                                ,color: $Zone.Yellow}
-                                                               ,{date: A2($Result.withDefault,$Date.fromTime(0),$Date.fromString("2016-02-07 00:00:00"))
-                                                                ,color: $Zone.Green}])}])
+                                            ,decayRate: 2
+                                            ,checkins: _U.list([{date: constDate("2016-02-01 00:00:00"),color: $Zone.Yellow}
+                                                               ,{date: constDate("2016-02-04 00:00:00"),color: $Zone.Green}
+                                                               ,{date: constDate("2016-02-09 00:00:00"),color: $Zone.Green}])}])
                     ,date: $Date.fromTime(0)
-                    ,daysToShow: 6};
+                    ,daysToShow: 10};
    var Update = function (a) {    return {ctor: "Update",_0: a};};
-   var clock = A2($Signal.map,function (_p6) {    return Update($Date.fromTime(_p6));},$Time.every($Time.second));
+   var clock = A2($Signal.map,function (_p9) {    return Update($Date.fromTime(_p9));},$Time.every($Time.second));
    var NoOp = {ctor: "NoOp"};
    var actions = $Signal.mailbox(NoOp);
    var model = A3($Signal.foldp,update,startModel,A2($Signal.merge,actions.signal,clock));
-   var view = F2(function (address,_p7) {
-      var _p8 = _p7;
-      var dates = A2(listOfDates,_p8.date,_p8.daysToShow);
+   var view = F2(function (address,_p10) {
+      var _p11 = _p10;
+      var dates = A2(listOfDates,_p11.date,_p11.daysToShow);
       return A2($Html.div,
       _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "margin-top",_1: "25px"},{ctor: "_Tuple2",_0: "margin-left",_1: "25px"}]))]),
       _U.list([A2(viewHeaderRow,dates,viewHeaderDayCell)
               ,A2(viewHeaderRow,dates,viewHeaderCell)
-              ,A2($HabitList.view,A2($Signal.forwardTo,address,$Basics.always(NoOp)),A2(toHabitList,dates,_p8.habitRecords))]));
+              ,A2($HabitList.view,A2($Signal.forwardTo,address,$Basics.always(NoOp)),A2(toHabitList,dates,_p11.habitRecords))]));
    });
    var Checkin = F2(function (a,b) {    return {date: a,color: b};});
-   var HabitRecord = F2(function (a,b) {    return {label: a,checkins: b};});
+   var HabitRecord = F3(function (a,b,c) {    return {label: a,decayRate: b,checkins: c};});
    var Model = F3(function (a,b,c) {    return {habitRecords: a,date: b,daysToShow: c};});
    return _elm.HabitChart.values = {_op: _op
                                    ,Model: Model
@@ -11126,12 +11203,14 @@ Elm.HabitChart.make = function (_elm) {
                                    ,NoOp: NoOp
                                    ,Update: Update
                                    ,startModel: startModel
+                                   ,constDate: constDate
                                    ,actions: actions
                                    ,model: model
                                    ,clock: clock
                                    ,view: view
                                    ,dateEquals: dateEquals
                                    ,toHabitList: toHabitList
+                                   ,decayZone: decayZone
                                    ,listOfDates: listOfDates
                                    ,viewHeaderRow: viewHeaderRow
                                    ,viewHeaderMonthCell: viewHeaderMonthCell

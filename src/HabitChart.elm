@@ -1,6 +1,6 @@
 module HabitChart where
 
-import Zone exposing (update, view)
+import Zone exposing (update, view, Color(..))
 import Habit exposing (update, view)
 import HabitList exposing (update, view)
 import Html exposing (..)
@@ -9,6 +9,7 @@ import Html.Events exposing (onClick)
 import Time exposing (Time)
 import Date exposing (Date, Month, fromTime, year, month, day, dayOfWeek, hour, minute, second)
 import Date.Period as Period
+import Date.Compare as Compare exposing (Compare2 (..), is)
 import String exposing (left)
 
 type alias Model = {
@@ -19,12 +20,13 @@ type alias Model = {
 
 type alias HabitRecord = {
   label: String,
+  decayRate: Int,
   checkins: List Checkin
 }
 
 type alias Checkin = {
   date: Date,
-  color: Zone.Color
+  color: Color
 }
 
 type Action = NoOp | Update Date
@@ -34,21 +36,26 @@ startModel = {
     habitRecords = [
       {
         label = "Sleep",
+        decayRate = 2,
         checkins = [{
-          date = Result.withDefault (Date.fromTime 0) (Date.fromString "2016-02-04 00:00:00"),
-          color = Zone.Red
+          date = constDate "2016-02-01 00:00:00",
+          color = Yellow
         },{
-          date = Result.withDefault (Date.fromTime 0) (Date.fromString "2016-02-06 00:00:00"),
-          color = Zone.Yellow
+          date = constDate "2016-02-04 00:00:00",
+          color = Green
         },{
-          date = Result.withDefault (Date.fromTime 0) (Date.fromString "2016-02-07 00:00:00"),
-          color = Zone.Green
+          date = constDate "2016-02-09 00:00:00",
+          color = Green
         }]
       }
     ],
     date = fromTime 0,
-    daysToShow = 6
+    daysToShow = 10
   }
+
+constDate : String -> Date
+constDate str =
+  Result.withDefault (Date.fromTime 0) (Date.fromString str)
 
 actions : Signal.Mailbox Action
 actions =
@@ -86,22 +93,39 @@ dateEquals date1 date2 =
 toHabitList : List Date -> List HabitRecord -> List Habit.Model
 toHabitList dates habitRecords =
   let
-    findZone : List Checkin -> Date -> Zone.Model
-    findZone checkins date =
+    firstDate = case List.head dates of
+      Just date -> date
+      Nothing -> fromTime 0
+
+    findZone : List Checkin -> Int -> Int -> Date -> Zone.Model
+    findZone checkins decayRate decay date =
       let
         searchCheckin = List.head <| List.filter (dateEquals date << .date) checkins
       in
         case searchCheckin of
-          Just checkin -> Zone.Active checkin.color
-          Nothing -> Zone.Empty
+          Just { color } -> Zone.Active color
+          Nothing -> if is Compare.SameOrAfter date firstDate
+            -- TODO: Why does this pass Empty to decayZone on the second recursive call?
+            then case findZone checkins decayRate (decay + 1) (Period.add Period.Day -1 date) of
+              Zone.Active color -> decayZone decayRate decay color
+              Zone.Decaying color -> decayZone decayRate decay color
+              Zone.Empty -> Zone.Empty
+            else Zone.Empty
 
     toHabit : HabitRecord -> Habit.Model
-    toHabit { label, checkins } = {
+    toHabit { label, decayRate, checkins } = {
         label = label,
-        zones = List.map (findZone checkins) dates
+        zones = List.map (findZone checkins decayRate 0) dates
       }
   in
     List.map toHabit habitRecords
+
+decayZone : Int -> Int -> Color -> Zone.Model
+decayZone decayRate decay color =
+  case color of
+    Green -> if decay < decayRate then Zone.Active Green else Zone.Active Yellow
+    Yellow -> if decay < decayRate then Zone.Active Yellow else Zone.Active Red
+    Red -> Zone.Active Red
 
 -- Gets a list of n days up to the given date
 listOfDates : Date -> Int -> List Date
