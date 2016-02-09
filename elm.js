@@ -10984,6 +10984,7 @@ Elm.HabitChart.make = function (_elm) {
    $Date = Elm.Date.make(_elm),
    $Date$Period = Elm.Date.Period.make(_elm),
    $Debug = Elm.Debug.make(_elm),
+   $Habit = Elm.Habit.make(_elm),
    $HabitList = Elm.HabitList.make(_elm),
    $Html = Elm.Html.make(_elm),
    $Html$Attributes = Elm.Html.Attributes.make(_elm),
@@ -10992,7 +10993,8 @@ Elm.HabitChart.make = function (_elm) {
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $String = Elm.String.make(_elm),
-   $Time = Elm.Time.make(_elm);
+   $Time = Elm.Time.make(_elm),
+   $Zone = Elm.Zone.make(_elm);
    var _op = {};
    var headerCellLightStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "font-family",_1: "Helvetica Neue"}
                                                              ,{ctor: "_Tuple2",_0: "font-weight",_1: "400"}
@@ -11069,30 +11071,58 @@ Elm.HabitChart.make = function (_elm) {
    var viewHeaderMonthCell = function (date) {
       return A2($Html.span,_U.list([headerCellStyle]),_U.list([$Html.text(_U.eq($Date.day(date),1) ? showFullMonth(date) : "")]));
    };
+   var viewHeaderRow = F2(function (dates,viewCell) {
+      return A2($Html.div,_U.list([]),_U.list([A2($Html.span,_U.list([labelStyle]),_U.list([])),A2($Html.span,_U.list([]),A2($List.map,viewCell,dates))]));
+   });
    var listOfDates = F2(function (date,days) {
       return A2($List.map,function (n) {    return A3($Date$Period.add,$Date$Period.Day,0 - n,date);},$List.reverse(_U.range(0,days - 1)));
    });
-   var viewHeaderRow = F3(function (date,days,viewCell) {
-      return A2($Html.div,
-      _U.list([]),
-      _U.list([A2($Html.span,_U.list([labelStyle]),_U.list([])),A2($Html.span,_U.list([]),A2($List.map,viewCell,A2(listOfDates,date,days)))]));
+   var dateEquals = F2(function (date1,date2) {
+      return _U.eq($Date.year(date1),$Date.year(date2)) && (_U.eq($Date.month(date1),$Date.month(date2)) && _U.eq($Date.day(date1),$Date.day(date2)));
    });
-   var startModel = {habitList: $HabitList.model,date: $Date.fromTime(0),daysToShow: 6};
+   var toHabitList = F2(function (dates,habitRecords) {
+      var findZone = F2(function (checkins,date) {
+         var searchCheckin = $List.head(A2($List.filter,function (_p2) {    return A2(dateEquals,date,function (_) {    return _.date;}(_p2));},checkins));
+         var _p3 = searchCheckin;
+         if (_p3.ctor === "Just") {
+               return $Zone.Active(_p3._0.color);
+            } else {
+               return $Zone.Empty;
+            }
+      });
+      var toHabit = function (_p4) {    var _p5 = _p4;return {label: _p5.label,zones: A2($List.map,findZone(_p5.checkins),dates)};};
+      return A2($List.map,toHabit,habitRecords);
+   });
+   var startModel = {habitRecords: _U.list([{label: "Sleep"
+                                            ,checkins: _U.list([{date: A2($Result.withDefault,$Date.fromTime(0),$Date.fromString("2016-02-04 00:00:00"))
+                                                                ,color: $Zone.Red}
+                                                               ,{date: A2($Result.withDefault,$Date.fromTime(0),$Date.fromString("2016-02-06 00:00:00"))
+                                                                ,color: $Zone.Yellow}
+                                                               ,{date: A2($Result.withDefault,$Date.fromTime(0),$Date.fromString("2016-02-07 00:00:00"))
+                                                                ,color: $Zone.Green}])}])
+                    ,date: $Date.fromTime(0)
+                    ,daysToShow: 6};
    var Update = function (a) {    return {ctor: "Update",_0: a};};
-   var clock = A2($Signal.map,function (_p2) {    return Update($Date.fromTime(_p2));},$Time.every($Time.second));
+   var clock = A2($Signal.map,function (_p6) {    return Update($Date.fromTime(_p6));},$Time.every($Time.second));
    var NoOp = {ctor: "NoOp"};
    var actions = $Signal.mailbox(NoOp);
    var model = A3($Signal.foldp,update,startModel,A2($Signal.merge,actions.signal,clock));
-   var view = F2(function (address,model) {
+   var view = F2(function (address,_p7) {
+      var _p8 = _p7;
+      var dates = A2(listOfDates,_p8.date,_p8.daysToShow);
       return A2($Html.div,
       _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "margin-top",_1: "25px"},{ctor: "_Tuple2",_0: "margin-left",_1: "25px"}]))]),
-      _U.list([A3(viewHeaderRow,model.date,model.daysToShow,viewHeaderDayCell)
-              ,A3(viewHeaderRow,model.date,model.daysToShow,viewHeaderCell)
-              ,A2($HabitList.view,A2($Signal.forwardTo,address,$Basics.always(NoOp)),model.habitList)]));
+      _U.list([A2(viewHeaderRow,dates,viewHeaderDayCell)
+              ,A2(viewHeaderRow,dates,viewHeaderCell)
+              ,A2($HabitList.view,A2($Signal.forwardTo,address,$Basics.always(NoOp)),A2(toHabitList,dates,_p8.habitRecords))]));
    });
-   var Model = F3(function (a,b,c) {    return {habitList: a,date: b,daysToShow: c};});
+   var Checkin = F2(function (a,b) {    return {date: a,color: b};});
+   var HabitRecord = F2(function (a,b) {    return {label: a,checkins: b};});
+   var Model = F3(function (a,b,c) {    return {habitRecords: a,date: b,daysToShow: c};});
    return _elm.HabitChart.values = {_op: _op
                                    ,Model: Model
+                                   ,HabitRecord: HabitRecord
+                                   ,Checkin: Checkin
                                    ,NoOp: NoOp
                                    ,Update: Update
                                    ,startModel: startModel
@@ -11100,6 +11130,8 @@ Elm.HabitChart.make = function (_elm) {
                                    ,model: model
                                    ,clock: clock
                                    ,view: view
+                                   ,dateEquals: dateEquals
+                                   ,toHabitList: toHabitList
                                    ,listOfDates: listOfDates
                                    ,viewHeaderRow: viewHeaderRow
                                    ,viewHeaderMonthCell: viewHeaderMonthCell
