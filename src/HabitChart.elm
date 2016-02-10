@@ -1,16 +1,17 @@
 module HabitChart where
 
-import Zone exposing (update, view, Color(..))
-import Habit exposing (update, view)
-import HabitList exposing (update, view)
-import Html exposing (..)
-import Html.Attributes exposing (style)
-import Html.Events exposing (onClick)
 import Time exposing (Time)
 import Date exposing (Date, Month, fromTime, year, month, day, dayOfWeek, hour, minute, second)
 import Date.Period as Period
 import Date.Compare as Compare exposing (Compare2 (..), is)
 import String exposing (left)
+import Html exposing (..)
+import Html.Attributes exposing (style)
+import Html.Events exposing (onClick)
+import DateUtil exposing (..)
+import Zone exposing (update, view, Color(..))
+import Habit exposing (update, view)
+import HabitList exposing (update, view)
 
 type alias Model = {
   habitRecords: List HabitRecord,
@@ -56,10 +57,6 @@ startModel = {
     daysToShow = 14
   }
 
-constDate : String -> Date
-constDate str =
-  Result.withDefault (Date.fromTime 0) (Date.fromString str)
-
 actions : Signal.Mailbox Action
 actions =
   Signal.mailbox NoOp
@@ -86,19 +83,10 @@ view address { date, daysToShow, habitRecords } =
       HabitList.view (Signal.forwardTo address <| always NoOp) (toHabitList dates habitRecords)
     ]
 
--- Elm date equality does not work in v0.16
-dateEquals : Date -> Date -> Bool
-dateEquals date1 date2 =
-  year date1 == year date2 &&
-  month date1 == month date2 &&
-  day date1 == day date2
-
 toHabitList : List Date -> List HabitRecord -> List Habit.Model
 toHabitList dates habitRecords =
   let
-    firstDate = case List.head dates of
-      Just date -> date
-      Nothing -> fromTime 0
+    firstDate = Maybe.withDefault (fromTime 0) List.head dates
 
     findZone : List Checkin -> Int -> Int -> Date -> Maybe Color
     findZone checkins decayRate decay date =
@@ -136,11 +124,6 @@ decayStep color =
     Green -> Yellow
     _ -> Red
 
--- Gets a list of n days up to the given date
-listOfDates : Date -> Int -> List Date
-listOfDates date days =
-  (List.map (\n -> (Period.add Period.Day -n date)) (List.reverse [0 .. days - 1]))
-
 viewHeaderRow : List Date -> (Date -> Html) -> Html
 viewHeaderRow dates viewCell =
   div [] [
@@ -166,31 +149,6 @@ update action model =
     NoOp -> model
     Rotate date -> model
     Tick date -> { model | date = date }
-
-showDate : Date -> String
-showDate date =
-  toString (month date) ++ " " ++
-  toString (day date) ++ ", " ++
-  toString (year date) ++ "  " ++
-  toString (hour date) ++ ":" ++
-  toString (minute date) ++ ":" ++
-  toString (second date)
-
-showFullMonth : Date -> String
-showFullMonth date =
-  case month date of
-    Date.Jan -> "January"
-    Date.Feb -> "February"
-    Date.Mar -> "March"
-    Date.Apr -> "April"
-    Date.May -> "May"
-    Date.Jun -> "June"
-    Date.Jul -> "July"
-    Date.Aug -> "August"
-    Date.Sep -> "September"
-    Date.Oct -> "October"
-    Date.Nov -> "November"
-    Date.Dec -> "December"
 
 labelStyle : Attribute
 labelStyle = style [

@@ -1,12 +1,13 @@
 module HabitList where
 
 import Date exposing (Date)
-import Habit exposing (update, view)
-import Zone exposing (update, view, Color(..))
 import Html exposing (..)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
 import StartApp.Simple exposing (start)
+import DateUtil exposing (..)
+import Habit exposing (update, view)
+import Zone exposing (update, view, Color(..))
 
 type Action = Rotate String Habit.Action
 
@@ -72,7 +73,3 @@ update action habits = habits
 main : Signal Html
 main =
   start { model = model, update = update, view = view }
-
-constDate : String -> Date
-constDate str =
-  Result.withDefault (Date.fromTime 0) (Date.fromString str)
