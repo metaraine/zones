@@ -161,8 +161,15 @@ update action model =
         updateRecord : HabitRecord -> HabitRecord
         updateRecord habitRecord =
           { habitRecord |
-            checkins = List.map updateCheckin habitRecord.checkins
+            checkins =
+              case findCheckin habitRecord.checkins zoneDate of
+                Just _ -> List.map updateCheckin habitRecord.checkins
+                Nothing -> { date = zoneDate , color = Red } :: habitRecord.checkins
           }
+
+        findCheckin : List Checkin -> Date -> Maybe Checkin
+        findCheckin checkins date =
+          List.head <| List.filter (dateEquals date << .date) checkins
       in
         { model |
           habitRecords = List.map updateRecord model.habitRecords

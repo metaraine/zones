@@ -11209,10 +11209,24 @@ Elm.HabitChart.make = function (_elm) {
       var _p0 = action;
       switch (_p0.ctor)
       {case "NoOp": return model;
-         case "Rotate": var updateCheckin = function (checkin) {
-              return A2($DateUtil.dateEquals,_p0._0._1._0,checkin.date) ? {date: checkin.date,color: $Zone.rotateColor(checkin.color)} : checkin;
+         case "Rotate": var _p3 = _p0._0._1._0;
+           var findCheckin = F2(function (checkins,date) {
+              return $List.head(A2($List.filter,function (_p1) {    return A2($DateUtil.dateEquals,date,function (_) {    return _.date;}(_p1));},checkins));
+           });
+           var updateCheckin = function (checkin) {
+              return A2($DateUtil.dateEquals,_p3,checkin.date) ? {date: checkin.date,color: $Zone.rotateColor(checkin.color)} : checkin;
            };
-           var updateRecord = function (habitRecord) {    return _U.update(habitRecord,{checkins: A2($List.map,updateCheckin,habitRecord.checkins)});};
+           var updateRecord = function (habitRecord) {
+              return _U.update(habitRecord,
+              {checkins: function () {
+                 var _p2 = A2(findCheckin,habitRecord.checkins,_p3);
+                 if (_p2.ctor === "Just") {
+                       return A2($List.map,updateCheckin,habitRecord.checkins);
+                    } else {
+                       return A2($List._op["::"],{date: _p3,color: $Zone.Red},habitRecord.checkins);
+                    }
+              }()});
+           };
            return _U.update(model,{habitRecords: A2($List.map,updateRecord,model.habitRecords)});
          default: return _U.update(model,{date: _p0._0});}
    });
@@ -11226,19 +11240,19 @@ Elm.HabitChart.make = function (_elm) {
    var viewHeaderRow = F2(function (dates,viewCell) {
       return A2($Html.div,_U.list([]),_U.list([A2($Html.span,_U.list([labelStyle]),_U.list([])),A2($Html.span,_U.list([]),A2($List.map,viewCell,dates))]));
    });
-   var decayStep = function (color) {    var _p1 = color;if (_p1.ctor === "Green") {    return $Zone.Yellow;} else {    return $Zone.Red;}};
+   var decayStep = function (color) {    var _p4 = color;if (_p4.ctor === "Green") {    return $Zone.Yellow;} else {    return $Zone.Red;}};
    var decayZone = F3(function (decayRate,decay,color) {    return _U.eq(decayRate,0) ? $Zone.Red : _U.cmp(decay,decayRate) < 0 ? color : decayStep(color);});
    var toHabitList = F2(function (dates,habitRecords) {
       var firstDate = A2($Maybe.withDefault,$Date.fromTime(0),$List.head(dates));
       var findZone = F4(function (checkins,decayRate,decay,date) {
          var searchCheckin = $List.head(A2($List.filter,
-         function (_p2) {
-            return A2($DateUtil.dateEquals,date,function (_) {    return _.date;}(_p2));
+         function (_p5) {
+            return A2($DateUtil.dateEquals,date,function (_) {    return _.date;}(_p5));
          },
          checkins));
-         var _p3 = searchCheckin;
-         if (_p3.ctor === "Just") {
-               return $Maybe.Just(_p3._0.color);
+         var _p6 = searchCheckin;
+         if (_p6.ctor === "Just") {
+               return $Maybe.Just(_p6._0.color);
             } else {
                if (A3($Date$Compare.is,$Date$Compare.SameOrAfter,date,firstDate)) {
                      var nextDecay = A2($Basics._op["%"],decay + 1,_U.eq(decayRate,0) ? 1 : decayRate);
@@ -11247,10 +11261,10 @@ Elm.HabitChart.make = function (_elm) {
                   } else return $Maybe.Nothing;
             }
       });
-      var toHabit = function (_p4) {
-         var _p5 = _p4;
-         return {label: _p5.label
-                ,zones: A2($List.map,function (date) {    return {ctor: "_Tuple2",_0: date,_1: A4(findZone,_p5.checkins,_p5.decayRate,0,date)};},dates)};
+      var toHabit = function (_p7) {
+         var _p8 = _p7;
+         return {label: _p8.label
+                ,zones: A2($List.map,function (date) {    return {ctor: "_Tuple2",_0: date,_1: A4(findZone,_p8.checkins,_p8.decayRate,0,date)};},dates)};
       };
       return A2($List.map,toHabit,habitRecords);
    });
@@ -11262,16 +11276,16 @@ Elm.HabitChart.make = function (_elm) {
                     ,date: $Date.fromTime(0)
                     ,daysToShow: 14};
    var Tick = function (a) {    return {ctor: "Tick",_0: a};};
-   var clock = A2($Signal.map,function (_p6) {    return Tick($Date.fromTime(_p6));},$Time.every($Time.second));
+   var clock = A2($Signal.map,function (_p9) {    return Tick($Date.fromTime(_p9));},$Time.every($Time.second));
    var Rotate = function (a) {    return {ctor: "Rotate",_0: a};};
-   var view = F2(function (address,_p7) {
-      var _p8 = _p7;
-      var dates = A2($DateUtil.listOfDates,_p8.date,_p8.daysToShow);
+   var view = F2(function (address,_p10) {
+      var _p11 = _p10;
+      var dates = A2($DateUtil.listOfDates,_p11.date,_p11.daysToShow);
       return A2($Html.div,
       _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "margin-top",_1: "25px"},{ctor: "_Tuple2",_0: "margin-left",_1: "25px"}]))]),
       _U.list([A2(viewHeaderRow,dates,viewHeaderDayCell)
               ,A2(viewHeaderRow,dates,viewHeaderCell)
-              ,A2($HabitList.view,A2($Signal.forwardTo,address,Rotate),A2(toHabitList,dates,_p8.habitRecords))]));
+              ,A2($HabitList.view,A2($Signal.forwardTo,address,Rotate),A2(toHabitList,dates,_p11.habitRecords))]));
    });
    var NoOp = {ctor: "NoOp"};
    var actions = $Signal.mailbox(NoOp);
