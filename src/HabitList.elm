@@ -1,11 +1,12 @@
 module HabitList where
 
+import Date exposing (Date)
 import Habit exposing (update, view)
 import Zone exposing (update, view, Color(..))
 import Html exposing (..)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
-import Date exposing (Date)
+import StartApp.Simple exposing (start)
 
 type Action = Rotate String Habit.Action
 
@@ -67,6 +68,10 @@ viewHabit address model =
 
 update : Action -> List Habit.Model -> List Habit.Model
 update action habits = habits
+
+main : Signal Html
+main =
+  start { model = model, update = update, view = view }
 
 constDate : String -> Date
 constDate str =

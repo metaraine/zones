@@ -10552,6 +10552,39 @@ Elm.Html.Events.make = function (_elm) {
                                     ,keyCode: keyCode
                                     ,Options: Options};
 };
+Elm.StartApp = Elm.StartApp || {};
+Elm.StartApp.Simple = Elm.StartApp.Simple || {};
+Elm.StartApp.Simple.make = function (_elm) {
+   "use strict";
+   _elm.StartApp = _elm.StartApp || {};
+   _elm.StartApp.Simple = _elm.StartApp.Simple || {};
+   if (_elm.StartApp.Simple.values) return _elm.StartApp.Simple.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var start = function (config) {
+      var update = F2(function (maybeAction,model) {
+         var _p0 = maybeAction;
+         if (_p0.ctor === "Just") {
+               return A2(config.update,_p0._0,model);
+            } else {
+               return _U.crashCase("StartApp.Simple",{start: {line: 91,column: 7},end: {line: 96,column: 52}},_p0)("This should never happen.");
+            }
+      });
+      var actions = $Signal.mailbox($Maybe.Nothing);
+      var address = A2($Signal.forwardTo,actions.address,$Maybe.Just);
+      var model = A3($Signal.foldp,update,config.model,actions.signal);
+      return A2($Signal.map,config.view(address),model);
+   };
+   var Config = F3(function (a,b,c) {    return {model: a,view: b,update: c};});
+   return _elm.StartApp.Simple.values = {_op: _op,Config: Config,start: start};
+};
 Elm.Zone = Elm.Zone || {};
 Elm.Zone.make = function (_elm) {
    "use strict";
@@ -10566,7 +10599,8 @@ Elm.Zone.make = function (_elm) {
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
+   $Signal = Elm.Signal.make(_elm),
+   $StartApp$Simple = Elm.StartApp.Simple.make(_elm);
    var _op = {};
    var colorToHex = function (color) {
       var _p0 = color;
@@ -10598,6 +10632,7 @@ Elm.Zone.make = function (_elm) {
    var Red = {ctor: "Red"};
    var rotateColor = function (color) {    var _p2 = color;switch (_p2.ctor) {case "Green": return Red;case "Yellow": return Green;default: return Yellow;}};
    var update = function (action) {    return $Maybe.map(rotateColor);};
+   var main = $StartApp$Simple.start({model: model,update: update,view: view});
    return _elm.Zone.values = {_op: _op
                              ,Red: Red
                              ,Yellow: Yellow
@@ -10608,6 +10643,7 @@ Elm.Zone.make = function (_elm) {
                              ,zoneStyle: zoneStyle
                              ,view: view
                              ,update: update
+                             ,main: main
                              ,rotateColor: rotateColor};
 };
 Elm.Habit = Elm.Habit || {};
@@ -10625,6 +10661,7 @@ Elm.Habit.make = function (_elm) {
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
+   $StartApp$Simple = Elm.StartApp.Simple.make(_elm),
    $Zone = Elm.Zone.make(_elm);
    var _op = {};
    var constDate = function (str) {    return A2($Result.withDefault,$Date.fromTime(0),$Date.fromString(str));};
@@ -10659,6 +10696,7 @@ Elm.Habit.make = function (_elm) {
       _U.list([]),
       _U.list([A2($Html.span,_U.list([labelStyle]),_U.list([$Html.text(_p3.label)])),A2($Html.span,_U.list([]),A2($List.map,viewZone(address),_p3.zones))]));
    });
+   var main = $StartApp$Simple.start({model: model,update: update,view: view});
    var Model = F2(function (a,b) {    return {label: a,zones: b};});
    return _elm.Habit.values = {_op: _op
                               ,Model: Model
@@ -10667,6 +10705,7 @@ Elm.Habit.make = function (_elm) {
                               ,view: view
                               ,viewZone: viewZone
                               ,update: update
+                              ,main: main
                               ,labelStyle: labelStyle
                               ,constDate: constDate};
 };
@@ -10685,6 +10724,7 @@ Elm.HabitList.make = function (_elm) {
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
+   $StartApp$Simple = Elm.StartApp.Simple.make(_elm),
    $Zone = Elm.Zone.make(_elm);
    var _op = {};
    var constDate = function (str) {    return A2($Result.withDefault,$Date.fromTime(0),$Date.fromString(str));};
@@ -10720,7 +10760,8 @@ Elm.HabitList.make = function (_elm) {
    var Rotate = F2(function (a,b) {    return {ctor: "Rotate",_0: a,_1: b};});
    var viewHabit = F2(function (address,model) {    return A2($Habit.view,A2($Signal.forwardTo,address,Rotate(model.label)),model);});
    var view = F2(function (address,habits) {    return A2($Html.div,_U.list([]),A2($List.map,viewHabit(address),habits));});
-   return _elm.HabitList.values = {_op: _op,Rotate: Rotate,model: model,view: view,viewHabit: viewHabit,update: update,constDate: constDate};
+   var main = $StartApp$Simple.start({model: model,update: update,view: view});
+   return _elm.HabitList.values = {_op: _op,Rotate: Rotate,model: model,view: view,viewHabit: viewHabit,update: update,main: main,constDate: constDate};
 };
 Elm.Date = Elm.Date || {};
 Elm.Date.Core = Elm.Date.Core || {};
@@ -11223,39 +11264,6 @@ Elm.HabitChart.make = function (_elm) {
                                    ,labelStyle: labelStyle
                                    ,headerCellStyle: headerCellStyle
                                    ,headerCellLightStyle: headerCellLightStyle};
-};
-Elm.StartApp = Elm.StartApp || {};
-Elm.StartApp.Simple = Elm.StartApp.Simple || {};
-Elm.StartApp.Simple.make = function (_elm) {
-   "use strict";
-   _elm.StartApp = _elm.StartApp || {};
-   _elm.StartApp.Simple = _elm.StartApp.Simple || {};
-   if (_elm.StartApp.Simple.values) return _elm.StartApp.Simple.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Html = Elm.Html.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var start = function (config) {
-      var update = F2(function (maybeAction,model) {
-         var _p0 = maybeAction;
-         if (_p0.ctor === "Just") {
-               return A2(config.update,_p0._0,model);
-            } else {
-               return _U.crashCase("StartApp.Simple",{start: {line: 91,column: 7},end: {line: 96,column: 52}},_p0)("This should never happen.");
-            }
-      });
-      var actions = $Signal.mailbox($Maybe.Nothing);
-      var address = A2($Signal.forwardTo,actions.address,$Maybe.Just);
-      var model = A3($Signal.foldp,update,config.model,actions.signal);
-      return A2($Signal.map,config.view(address),model);
-   };
-   var Config = F3(function (a,b,c) {    return {model: a,view: b,update: c};});
-   return _elm.StartApp.Simple.values = {_op: _op,Config: Config,start: start};
 };
 Elm.Main = Elm.Main || {};
 Elm.Main.make = function (_elm) {

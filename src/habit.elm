@@ -1,10 +1,11 @@
 module Habit where
 
+import Date exposing (Date)
 import Zone exposing (update, view, Color(..))
 import Html exposing (..)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
-import Date exposing (Date)
+import StartApp.Simple exposing (start)
 
 type alias Model = {
   label: String,
@@ -44,6 +45,10 @@ viewZone address (date, colorOrNot) =
 
 update : Action -> Model -> Model
 update action model = model
+
+main : Signal Html
+main =
+  start { model = model, update = update, view = view }
 
 labelStyle : Attribute
 labelStyle = style [

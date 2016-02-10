@@ -3,6 +3,7 @@ module Zone where
 import Html exposing (..)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
+import StartApp.Simple exposing (start)
 
 type Color = Red | Yellow | Green
 
@@ -36,6 +37,10 @@ view address model =
 update : Action -> Maybe Color -> Maybe Color
 update action =
   Maybe.map rotateColor
+
+main : Signal Html
+main =
+  start { model = model, update = update, view = view }
 
 rotateColor : Color -> Color
 rotateColor color =
