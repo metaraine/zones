@@ -148,33 +148,33 @@ update action model =
   case action of
     NoOp -> model
     Rotate (HabitList.Rotate label (Habit.Rotate zoneDate zoneAction)) ->
-      let
-        updateCheckin : Checkin -> Checkin
-        updateCheckin checkin =
-          if dateEquals zoneDate checkin.date
-          then {
-            date = checkin.date,
-            color = Zone.rotateColor checkin.color
-          }
-          else checkin
-
-        updateRecord : HabitRecord -> HabitRecord
-        updateRecord habitRecord =
-          { habitRecord |
-            checkins =
-              case findCheckin habitRecord.checkins zoneDate of
-                Just _ -> List.map updateCheckin habitRecord.checkins
-                Nothing -> { date = zoneDate , color = Red } :: habitRecord.checkins
-          }
-
-        findCheckin : List Checkin -> Date -> Maybe Checkin
-        findCheckin checkins date =
-          List.head <| List.filter (dateEquals date << .date) checkins
-      in
-        { model |
-          habitRecords = List.map updateRecord model.habitRecords
-        }
+      { model |
+        habitRecords = List.map (updateRecord label zoneDate) model.habitRecords
+      }
     Tick date -> { model | date = date }
+
+updateRecord : String -> Date -> HabitRecord -> HabitRecord
+updateRecord label date habitRecord =
+  let
+    updateCheckin : Checkin -> Checkin
+    updateCheckin checkin =
+      if dateEquals date checkin.date
+      then {
+        date = checkin.date,
+        color = Zone.rotateColor checkin.color
+      }
+      else checkin
+
+    findCheckin : List Checkin -> Date -> Maybe Checkin
+    findCheckin checkins date =
+      List.head <| List.filter (dateEquals date << .date) checkins
+  in
+    { habitRecord |
+      checkins =
+        case findCheckin habitRecord.checkins date of
+          Just _ -> List.map updateCheckin habitRecord.checkins
+          Nothing -> { date = date , color = Green } :: habitRecord.checkins
+    }
 
 labelStyle : Attribute
 labelStyle = style [
