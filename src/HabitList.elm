@@ -1,7 +1,7 @@
 module HabitList where
 
 import Habit exposing (update, view)
-import Zone exposing (update, view, Model, Color(..), Action(..))
+import Zone exposing (update, view, Color(..), Action(..))
 import Html exposing (..)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)

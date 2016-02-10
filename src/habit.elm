@@ -34,12 +34,8 @@ view : Signal.Address Zone.Action -> Model -> Html
 view address { label, zones } =
   div [] [
     span [ labelStyle ] [ text label ],
-    span [] <| List.map (Zone.view address << toZone) zones
+    span [] <| List.map (Zone.view address) zones
   ]
-
-toZone : Maybe Color -> Zone.Model
-toZone =
-  Maybe.map (\c -> { color = c, faded = False } )
 
 update : Action -> Model -> Model
 update action model = model

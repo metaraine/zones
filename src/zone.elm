@@ -8,16 +8,8 @@ type Color = Red | Yellow | Green
 
 type Action = Rotate
 
-type alias Model = Maybe {
-  color: Color,
-  faded: Bool
-}
-
-model : Model
-model = Just {
-    color = Green,
-    faded = False
-  }
+model : Maybe Color
+model = Just Green
 
 colorToHex : Color -> String
 colorToHex color =
@@ -26,23 +18,28 @@ colorToHex color =
     Yellow -> "#FFD666"
     Green -> "#57BB8A"
 
-zoneStyle : Model -> Attribute
-zoneStyle model =
+zoneStyle : Maybe Color -> Attribute
+zoneStyle colorOrNot =
   style
-    [ ("background-color", case model of
-      Just { color } -> colorToHex color
+    [ ("background-color", case colorOrNot of
+      Just color -> colorToHex color
       Nothing -> "transparent")
     , ("display", "inline-block")
     , ("width", "20px")
     , ("height", "20px")
-    , ("opacity", case model of
-      Just { faded } -> if faded then "0.3" else "1.0"
-      Nothing -> "1.0")
     ]
 
-view : Signal.Address Action -> Model -> Html
+view : Signal.Address Action -> Maybe Color -> Html
 view address model =
   span [ onClick address Rotate, zoneStyle model ] []
 
-update : Action -> Model -> Model
-update action model = model
+update : Action -> Maybe Color -> Maybe Color
+update action =
+  Maybe.map rotateColor
+
+rotateColor : Color -> Color
+rotateColor color =
+  case color of
+    Green -> Red
+    Yellow -> Green
+    Red -> Yellow

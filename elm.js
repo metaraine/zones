@@ -10568,7 +10568,6 @@ Elm.Zone.make = function (_elm) {
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
-   var update = F2(function (action,model) {    return model;});
    var colorToHex = function (color) {
       var _p0 = color;
       switch (_p0.ctor)
@@ -10576,37 +10575,29 @@ Elm.Zone.make = function (_elm) {
          case "Yellow": return "#FFD666";
          default: return "#57BB8A";}
    };
-   var zoneStyle = function (model) {
+   var zoneStyle = function (colorOrNot) {
       return $Html$Attributes.style(_U.list([{ctor: "_Tuple2"
                                              ,_0: "background-color"
                                              ,_1: function () {
-                                                var _p1 = model;
+                                                var _p1 = colorOrNot;
                                                 if (_p1.ctor === "Just") {
-                                                      return colorToHex(_p1._0.color);
+                                                      return colorToHex(_p1._0);
                                                    } else {
                                                       return "transparent";
                                                    }
                                              }()}
                                             ,{ctor: "_Tuple2",_0: "display",_1: "inline-block"}
                                             ,{ctor: "_Tuple2",_0: "width",_1: "20px"}
-                                            ,{ctor: "_Tuple2",_0: "height",_1: "20px"}
-                                            ,{ctor: "_Tuple2"
-                                             ,_0: "opacity"
-                                             ,_1: function () {
-                                                var _p2 = model;
-                                                if (_p2.ctor === "Just") {
-                                                      return _p2._0.faded ? "0.3" : "1.0";
-                                                   } else {
-                                                      return "1.0";
-                                                   }
-                                             }()}]));
+                                            ,{ctor: "_Tuple2",_0: "height",_1: "20px"}]));
    };
    var Rotate = {ctor: "Rotate"};
    var view = F2(function (address,model) {    return A2($Html.span,_U.list([A2($Html$Events.onClick,address,Rotate),zoneStyle(model)]),_U.list([]));});
    var Green = {ctor: "Green"};
-   var model = $Maybe.Just({color: Green,faded: false});
+   var model = $Maybe.Just(Green);
    var Yellow = {ctor: "Yellow"};
    var Red = {ctor: "Red"};
+   var rotateColor = function (color) {    var _p2 = color;switch (_p2.ctor) {case "Green": return Red;case "Yellow": return Green;default: return Yellow;}};
+   var update = function (action) {    return $Maybe.map(rotateColor);};
    return _elm.Zone.values = {_op: _op
                              ,Red: Red
                              ,Yellow: Yellow
@@ -10616,7 +10607,8 @@ Elm.Zone.make = function (_elm) {
                              ,colorToHex: colorToHex
                              ,zoneStyle: zoneStyle
                              ,view: view
-                             ,update: update};
+                             ,update: update
+                             ,rotateColor: rotateColor};
 };
 Elm.Habit = Elm.Habit || {};
 Elm.Habit.make = function (_elm) {
@@ -10645,13 +10637,11 @@ Elm.Habit.make = function (_elm) {
                                                    ,{ctor: "_Tuple2",_0: "line-height",_1: "22px"}
                                                    ,{ctor: "_Tuple2",_0: "text-transform",_1: "uppercase"}]));
    var update = F2(function (action,model) {    return model;});
-   var toZone = $Maybe.map(function (c) {    return {color: c,faded: false};});
    var view = F2(function (address,_p0) {
       var _p1 = _p0;
       return A2($Html.div,
       _U.list([]),
-      _U.list([A2($Html.span,_U.list([labelStyle]),_U.list([$Html.text(_p1.label)]))
-              ,A2($Html.span,_U.list([]),A2($List.map,function (_p2) {    return A2($Zone.view,address,toZone(_p2));},_p1.zones))]));
+      _U.list([A2($Html.span,_U.list([labelStyle]),_U.list([$Html.text(_p1.label)])),A2($Html.span,_U.list([]),A2($List.map,$Zone.view(address),_p1.zones))]));
    });
    var model = {label: "Meditation"
                ,zones: _U.list([$Maybe.Nothing
@@ -10667,7 +10657,7 @@ Elm.Habit.make = function (_elm) {
                                ,$Maybe.Just($Zone.Red)])};
    var Something = {ctor: "Something"};
    var Model = F2(function (a,b) {    return {label: a,zones: b};});
-   return _elm.Habit.values = {_op: _op,Model: Model,Something: Something,model: model,view: view,toZone: toZone,update: update,labelStyle: labelStyle};
+   return _elm.Habit.values = {_op: _op,Model: Model,Something: Something,model: model,view: view,update: update,labelStyle: labelStyle};
 };
 Elm.HabitList = Elm.HabitList || {};
 Elm.HabitList.make = function (_elm) {
