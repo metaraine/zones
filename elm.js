@@ -10617,6 +10617,7 @@ Elm.Habit.make = function (_elm) {
    if (_elm.Habit.values) return _elm.Habit.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
+   $Date = Elm.Date.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Html = Elm.Html.make(_elm),
    $Html$Attributes = Elm.Html.Attributes.make(_elm),
@@ -10626,6 +10627,7 @@ Elm.Habit.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $Zone = Elm.Zone.make(_elm);
    var _op = {};
+   var constDate = function (str) {    return A2($Result.withDefault,$Date.fromTime(0),$Date.fromString(str));};
    var labelStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "font-family",_1: "Helvetica Neue"}
                                                    ,{ctor: "_Tuple2",_0: "font-weight",_1: "400"}
                                                    ,{ctor: "_Tuple2",_0: "font-size",_1: "14px"}
@@ -10637,27 +10639,36 @@ Elm.Habit.make = function (_elm) {
                                                    ,{ctor: "_Tuple2",_0: "line-height",_1: "22px"}
                                                    ,{ctor: "_Tuple2",_0: "text-transform",_1: "uppercase"}]));
    var update = F2(function (action,model) {    return model;});
-   var view = F2(function (address,_p0) {
-      var _p1 = _p0;
+   var model = {label: "Meditation"
+               ,zones: _U.list([{ctor: "_Tuple2",_0: constDate("2016-02-10 00:00:00"),_1: $Maybe.Nothing}
+                               ,{ctor: "_Tuple2",_0: constDate("2016-02-10 00:00:00"),_1: $Maybe.Nothing}
+                               ,{ctor: "_Tuple2",_0: constDate("2016-02-10 00:00:00"),_1: $Maybe.Just($Zone.Red)}
+                               ,{ctor: "_Tuple2",_0: constDate("2016-02-10 00:00:00"),_1: $Maybe.Just($Zone.Red)}
+                               ,{ctor: "_Tuple2",_0: constDate("2016-02-10 00:00:00"),_1: $Maybe.Just($Zone.Yellow)}
+                               ,{ctor: "_Tuple2",_0: constDate("2016-02-10 00:00:00"),_1: $Maybe.Just($Zone.Yellow)}
+                               ,{ctor: "_Tuple2",_0: constDate("2016-02-10 00:00:00"),_1: $Maybe.Just($Zone.Green)}
+                               ,{ctor: "_Tuple2",_0: constDate("2016-02-10 00:00:00"),_1: $Maybe.Just($Zone.Green)}
+                               ,{ctor: "_Tuple2",_0: constDate("2016-02-10 00:00:00"),_1: $Maybe.Just($Zone.Green)}
+                               ,{ctor: "_Tuple2",_0: constDate("2016-02-10 00:00:00"),_1: $Maybe.Just($Zone.Yellow)}
+                               ,{ctor: "_Tuple2",_0: constDate("2016-02-10 00:00:00"),_1: $Maybe.Just($Zone.Red)}])};
+   var Rotate = function (a) {    return {ctor: "Rotate",_0: a};};
+   var viewZone = F2(function (address,_p0) {    var _p1 = _p0;return A2($Zone.view,A2($Signal.forwardTo,address,$Basics.always(Rotate(_p1._0))),_p1._1);});
+   var view = F2(function (address,_p2) {
+      var _p3 = _p2;
       return A2($Html.div,
       _U.list([]),
-      _U.list([A2($Html.span,_U.list([labelStyle]),_U.list([$Html.text(_p1.label)])),A2($Html.span,_U.list([]),A2($List.map,$Zone.view(address),_p1.zones))]));
+      _U.list([A2($Html.span,_U.list([labelStyle]),_U.list([$Html.text(_p3.label)])),A2($Html.span,_U.list([]),A2($List.map,viewZone(address),_p3.zones))]));
    });
-   var model = {label: "Meditation"
-               ,zones: _U.list([$Maybe.Nothing
-                               ,$Maybe.Nothing
-                               ,$Maybe.Just($Zone.Red)
-                               ,$Maybe.Just($Zone.Red)
-                               ,$Maybe.Just($Zone.Yellow)
-                               ,$Maybe.Just($Zone.Yellow)
-                               ,$Maybe.Just($Zone.Green)
-                               ,$Maybe.Just($Zone.Green)
-                               ,$Maybe.Just($Zone.Green)
-                               ,$Maybe.Just($Zone.Yellow)
-                               ,$Maybe.Just($Zone.Red)])};
-   var Something = {ctor: "Something"};
    var Model = F2(function (a,b) {    return {label: a,zones: b};});
-   return _elm.Habit.values = {_op: _op,Model: Model,Something: Something,model: model,view: view,update: update,labelStyle: labelStyle};
+   return _elm.Habit.values = {_op: _op
+                              ,Model: Model
+                              ,Rotate: Rotate
+                              ,model: model
+                              ,view: view
+                              ,viewZone: viewZone
+                              ,update: update
+                              ,labelStyle: labelStyle
+                              ,constDate: constDate};
 };
 Elm.HabitList = Elm.HabitList || {};
 Elm.HabitList.make = function (_elm) {
@@ -10666,6 +10677,7 @@ Elm.HabitList.make = function (_elm) {
    if (_elm.HabitList.values) return _elm.HabitList.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
+   $Date = Elm.Date.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Habit = Elm.Habit.make(_elm),
    $Html = Elm.Html.make(_elm),
@@ -10675,37 +10687,40 @@ Elm.HabitList.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $Zone = Elm.Zone.make(_elm);
    var _op = {};
-   var update = F2(function (action,model) {    return model;});
-   var view = F2(function (address,model) {    return A2($Html.div,_U.list([]),A2($List.map,$Habit.view(address),model));});
+   var constDate = function (str) {    return A2($Result.withDefault,$Date.fromTime(0),$Date.fromString(str));};
+   var update = F2(function (action,habits) {    return habits;});
    var model = _U.list([{label: "Sleep"
-                        ,zones: _U.list([$Maybe.Nothing
-                                        ,$Maybe.Just($Zone.Red)
-                                        ,$Maybe.Just($Zone.Yellow)
-                                        ,$Maybe.Just($Zone.Green)
-                                        ,$Maybe.Just($Zone.Green)
-                                        ,$Maybe.Just($Zone.Green)])}
+                        ,zones: _U.list([{ctor: "_Tuple2",_0: constDate("2016-02-10 00:00:00"),_1: $Maybe.Nothing}
+                                        ,{ctor: "_Tuple2",_0: constDate("2016-02-10 00:00:00"),_1: $Maybe.Just($Zone.Red)}
+                                        ,{ctor: "_Tuple2",_0: constDate("2016-02-10 00:00:00"),_1: $Maybe.Just($Zone.Yellow)}
+                                        ,{ctor: "_Tuple2",_0: constDate("2016-02-10 00:00:00"),_1: $Maybe.Just($Zone.Green)}
+                                        ,{ctor: "_Tuple2",_0: constDate("2016-02-10 00:00:00"),_1: $Maybe.Just($Zone.Green)}
+                                        ,{ctor: "_Tuple2",_0: constDate("2016-02-10 00:00:00"),_1: $Maybe.Just($Zone.Green)}])}
                        ,{label: "Diet"
-                        ,zones: _U.list([$Maybe.Just($Zone.Red)
-                                        ,$Maybe.Just($Zone.Red)
-                                        ,$Maybe.Just($Zone.Yellow)
-                                        ,$Maybe.Just($Zone.Yellow)
-                                        ,$Maybe.Just($Zone.Green)
-                                        ,$Maybe.Just($Zone.Yellow)])}
+                        ,zones: _U.list([{ctor: "_Tuple2",_0: constDate("2016-02-10 00:00:00"),_1: $Maybe.Just($Zone.Red)}
+                                        ,{ctor: "_Tuple2",_0: constDate("2016-02-10 00:00:00"),_1: $Maybe.Just($Zone.Red)}
+                                        ,{ctor: "_Tuple2",_0: constDate("2016-02-10 00:00:00"),_1: $Maybe.Just($Zone.Yellow)}
+                                        ,{ctor: "_Tuple2",_0: constDate("2016-02-10 00:00:00"),_1: $Maybe.Just($Zone.Yellow)}
+                                        ,{ctor: "_Tuple2",_0: constDate("2016-02-10 00:00:00"),_1: $Maybe.Just($Zone.Green)}
+                                        ,{ctor: "_Tuple2",_0: constDate("2016-02-10 00:00:00"),_1: $Maybe.Just($Zone.Yellow)}])}
                        ,{label: "Meditation"
-                        ,zones: _U.list([$Maybe.Nothing
-                                        ,$Maybe.Just($Zone.Red)
-                                        ,$Maybe.Just($Zone.Yellow)
-                                        ,$Maybe.Just($Zone.Green)
-                                        ,$Maybe.Just($Zone.Green)
-                                        ,$Maybe.Just($Zone.Yellow)])}
+                        ,zones: _U.list([{ctor: "_Tuple2",_0: constDate("2016-02-10 00:00:00"),_1: $Maybe.Nothing}
+                                        ,{ctor: "_Tuple2",_0: constDate("2016-02-10 00:00:00"),_1: $Maybe.Just($Zone.Red)}
+                                        ,{ctor: "_Tuple2",_0: constDate("2016-02-10 00:00:00"),_1: $Maybe.Just($Zone.Yellow)}
+                                        ,{ctor: "_Tuple2",_0: constDate("2016-02-10 00:00:00"),_1: $Maybe.Just($Zone.Green)}
+                                        ,{ctor: "_Tuple2",_0: constDate("2016-02-10 00:00:00"),_1: $Maybe.Just($Zone.Green)}
+                                        ,{ctor: "_Tuple2",_0: constDate("2016-02-10 00:00:00"),_1: $Maybe.Just($Zone.Yellow)}])}
                        ,{label: "Exercise"
-                        ,zones: _U.list([$Maybe.Just($Zone.Green)
-                                        ,$Maybe.Just($Zone.Green)
-                                        ,$Maybe.Just($Zone.Green)
-                                        ,$Maybe.Just($Zone.Yellow)
-                                        ,$Maybe.Just($Zone.Yellow)
-                                        ,$Maybe.Just($Zone.Red)])}]);
-   return _elm.HabitList.values = {_op: _op,model: model,view: view,update: update};
+                        ,zones: _U.list([{ctor: "_Tuple2",_0: constDate("2016-02-10 00:00:00"),_1: $Maybe.Just($Zone.Green)}
+                                        ,{ctor: "_Tuple2",_0: constDate("2016-02-10 00:00:00"),_1: $Maybe.Just($Zone.Green)}
+                                        ,{ctor: "_Tuple2",_0: constDate("2016-02-10 00:00:00"),_1: $Maybe.Just($Zone.Green)}
+                                        ,{ctor: "_Tuple2",_0: constDate("2016-02-10 00:00:00"),_1: $Maybe.Just($Zone.Yellow)}
+                                        ,{ctor: "_Tuple2",_0: constDate("2016-02-10 00:00:00"),_1: $Maybe.Just($Zone.Yellow)}
+                                        ,{ctor: "_Tuple2",_0: constDate("2016-02-10 00:00:00"),_1: $Maybe.Just($Zone.Red)}])}]);
+   var Rotate = F2(function (a,b) {    return {ctor: "Rotate",_0: a,_1: b};});
+   var viewHabit = F2(function (address,model) {    return A2($Habit.view,A2($Signal.forwardTo,address,Rotate(model.label)),model);});
+   var view = F2(function (address,habits) {    return A2($Html.div,_U.list([]),A2($List.map,viewHabit(address),habits));});
+   return _elm.HabitList.values = {_op: _op,Rotate: Rotate,model: model,view: view,viewHabit: viewHabit,update: update,constDate: constDate};
 };
 Elm.Date = Elm.Date || {};
 Elm.Date.Core = Elm.Date.Core || {};
@@ -11109,11 +11124,10 @@ Elm.HabitChart.make = function (_elm) {
    };
    var update = F2(function (action,model) {
       var _p1 = action;
-      if (_p1.ctor === "NoOp") {
-            return model;
-         } else {
-            return _U.update(model,{date: _p1._0});
-         }
+      switch (_p1.ctor)
+      {case "NoOp": return model;
+         case "Rotate": return model;
+         default: return _U.update(model,{date: _p1._0});}
    });
    var viewHeaderCell = function (date) {    return A2($Html.span,_U.list([headerCellStyle]),_U.list([$Html.text($Basics.toString($Date.day(date)))]));};
    var viewHeaderDayCell = function (date) {
@@ -11148,7 +11162,11 @@ Elm.HabitChart.make = function (_elm) {
                   } else return $Maybe.Nothing;
             }
       });
-      var toHabit = function (_p6) {    var _p7 = _p6;return {label: _p7.label,zones: A2($List.map,A3(findZone,_p7.checkins,_p7.decayRate,0),dates)};};
+      var toHabit = function (_p6) {
+         var _p7 = _p6;
+         return {label: _p7.label
+                ,zones: A2($List.map,function (date) {    return {ctor: "_Tuple2",_0: date,_1: A4(findZone,_p7.checkins,_p7.decayRate,0,date)};},dates)};
+      };
       return A2($List.map,toHabit,habitRecords);
    });
    var constDate = function (str) {    return A2($Result.withDefault,$Date.fromTime(0),$Date.fromString(str));};
@@ -11159,8 +11177,9 @@ Elm.HabitChart.make = function (_elm) {
                                                                ,{date: constDate("2016-02-09 00:00:00"),color: $Zone.Green}])}])
                     ,date: $Date.fromTime(0)
                     ,daysToShow: 14};
-   var Update = function (a) {    return {ctor: "Update",_0: a};};
-   var clock = A2($Signal.map,function (_p8) {    return Update($Date.fromTime(_p8));},$Time.every($Time.second));
+   var Tick = function (a) {    return {ctor: "Tick",_0: a};};
+   var clock = A2($Signal.map,function (_p8) {    return Tick($Date.fromTime(_p8));},$Time.every($Time.second));
+   var Rotate = function (a) {    return {ctor: "Rotate",_0: a};};
    var NoOp = {ctor: "NoOp"};
    var actions = $Signal.mailbox(NoOp);
    var model = A3($Signal.foldp,update,startModel,A2($Signal.merge,actions.signal,clock));
@@ -11181,7 +11200,8 @@ Elm.HabitChart.make = function (_elm) {
                                    ,HabitRecord: HabitRecord
                                    ,Checkin: Checkin
                                    ,NoOp: NoOp
-                                   ,Update: Update
+                                   ,Rotate: Rotate
+                                   ,Tick: Tick
                                    ,startModel: startModel
                                    ,constDate: constDate
                                    ,actions: actions

@@ -1,64 +1,73 @@
 module HabitList where
 
 import Habit exposing (update, view)
-import Zone exposing (update, view, Color(..), Action(..))
+import Zone exposing (update, view, Color(..))
 import Html exposing (..)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
+import Date exposing (Date)
 
-type alias Model = List Habit.Model
+type Action = Rotate String Habit.Action
 
-model : Model
+model : List Habit.Model
 model = [
     {
       label = "Sleep",
       zones = [
-        Nothing,
-        Just Red,
-        Just Yellow,
-        Just Green,
-        Just Green,
-        Just Green
+        (constDate "2016-02-10 00:00:00", Nothing),
+        (constDate "2016-02-10 00:00:00", Just Red),
+        (constDate "2016-02-10 00:00:00", Just Yellow),
+        (constDate "2016-02-10 00:00:00", Just Green),
+        (constDate "2016-02-10 00:00:00", Just Green),
+        (constDate "2016-02-10 00:00:00", Just Green)
       ]
     },
     {
       label = "Diet",
       zones = [
-        Just Red,
-        Just Red,
-        Just Yellow,
-        Just Yellow,
-        Just Green,
-        Just Yellow
+        (constDate "2016-02-10 00:00:00", Just Red),
+        (constDate "2016-02-10 00:00:00", Just Red),
+        (constDate "2016-02-10 00:00:00", Just Yellow),
+        (constDate "2016-02-10 00:00:00", Just Yellow),
+        (constDate "2016-02-10 00:00:00", Just Green),
+        (constDate "2016-02-10 00:00:00", Just Yellow)
       ]
     },
     {
       label = "Meditation",
       zones = [
-        Nothing,
-        Just Red,
-        Just Yellow,
-        Just Green,
-        Just Green,
-        Just Yellow
+        (constDate "2016-02-10 00:00:00", Nothing),
+        (constDate "2016-02-10 00:00:00", Just Red),
+        (constDate "2016-02-10 00:00:00", Just Yellow),
+        (constDate "2016-02-10 00:00:00", Just Green),
+        (constDate "2016-02-10 00:00:00", Just Green),
+        (constDate "2016-02-10 00:00:00", Just Yellow)
       ]
     },
     {
       label = "Exercise",
       zones = [
-        Just Green,
-        Just Green,
-        Just Green,
-        Just Yellow,
-        Just Yellow,
-        Just Red
+        (constDate "2016-02-10 00:00:00", Just Green),
+        (constDate "2016-02-10 00:00:00", Just Green),
+        (constDate "2016-02-10 00:00:00", Just Green),
+        (constDate "2016-02-10 00:00:00", Just Yellow),
+        (constDate "2016-02-10 00:00:00", Just Yellow),
+        (constDate "2016-02-10 00:00:00", Just Red)
       ]
     }
   ]
 
-view : Signal.Address Action -> Model -> Html
-view address model =
-  div [] <| List.map (Habit.view address) model
+view : Signal.Address Action -> List Habit.Model -> Html
+view address habits =
+  div [] <| List.map (viewHabit address) habits
 
-update : Action -> Model -> Model
-update action model = model
+viewHabit : Signal.Address Action -> Habit.Model -> Html
+viewHabit address model =
+  Habit.view (Signal.forwardTo address <| Rotate model.label) model
+
+update : Action -> List Habit.Model -> List Habit.Model
+update action habits = habits
+
+constDate : String -> Date
+constDate str =
+  Result.withDefault (Date.fromTime 0) (Date.fromString str)

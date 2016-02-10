@@ -29,7 +29,10 @@ type alias Checkin = {
   color: Color
 }
 
-type Action = NoOp | Update Date
+type Action =
+  NoOp
+  | Rotate Date
+  | Tick Date
 
 -- Needed for foldp but not used (http://stackoverflow.com/a/34095298/480608)
 startModel = {
@@ -66,7 +69,7 @@ model =
   Signal.foldp update startModel (Signal.merge actions.signal clock)
 
 clock : Signal Action
-clock = Signal.map (Update << fromTime) (Time.every Time.second)
+clock = Signal.map (Tick << fromTime) (Time.every Time.second)
 
 view : Signal.Address Action -> Model -> Html
 view address { date, daysToShow, habitRecords } =
@@ -116,7 +119,7 @@ toHabitList dates habitRecords =
     toHabit : HabitRecord -> Habit.Model
     toHabit { label, decayRate, checkins } = {
         label = label,
-        zones = List.map (findZone checkins decayRate 0) dates
+        zones = List.map (\date -> (date, findZone checkins decayRate 0 date)) dates
       }
   in
     List.map toHabit habitRecords
@@ -161,7 +164,8 @@ update : Action -> Model -> Model
 update action model =
   case action of
     NoOp -> model
-    Update date -> { model | date = date }
+    Rotate date -> model
+    Tick date -> { model | date = date }
 
 showDate : Date -> String
 showDate date =
