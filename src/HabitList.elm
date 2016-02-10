@@ -16,44 +16,44 @@ model = [
     {
       label = "Sleep",
       zones = [
-        (constDate "2016-02-10 00:00:00", Nothing),
-        (constDate "2016-02-10 00:00:00", Just Red),
-        (constDate "2016-02-10 00:00:00", Just Yellow),
-        (constDate "2016-02-10 00:00:00", Just Green),
-        (constDate "2016-02-10 00:00:00", Just Green),
+        (constDate "2016-02-05 00:00:00", Nothing),
+        (constDate "2016-02-06 00:00:00", Just Red),
+        (constDate "2016-02-07 00:00:00", Just Yellow),
+        (constDate "2016-02-08 00:00:00", Just Green),
+        (constDate "2016-02-09 00:00:00", Just Green),
         (constDate "2016-02-10 00:00:00", Just Green)
       ]
     },
     {
       label = "Diet",
       zones = [
-        (constDate "2016-02-10 00:00:00", Just Red),
-        (constDate "2016-02-10 00:00:00", Just Red),
-        (constDate "2016-02-10 00:00:00", Just Yellow),
-        (constDate "2016-02-10 00:00:00", Just Yellow),
-        (constDate "2016-02-10 00:00:00", Just Green),
+        (constDate "2016-02-05 00:00:00", Just Red),
+        (constDate "2016-02-06 00:00:00", Just Red),
+        (constDate "2016-02-07 00:00:00", Just Yellow),
+        (constDate "2016-02-08 00:00:00", Just Yellow),
+        (constDate "2016-02-09 00:00:00", Just Green),
         (constDate "2016-02-10 00:00:00", Just Yellow)
       ]
     },
     {
       label = "Meditation",
       zones = [
-        (constDate "2016-02-10 00:00:00", Nothing),
-        (constDate "2016-02-10 00:00:00", Just Red),
-        (constDate "2016-02-10 00:00:00", Just Yellow),
-        (constDate "2016-02-10 00:00:00", Just Green),
-        (constDate "2016-02-10 00:00:00", Just Green),
+        (constDate "2016-02-05 00:00:00", Nothing),
+        (constDate "2016-02-06 00:00:00", Just Red),
+        (constDate "2016-02-07 00:00:00", Just Yellow),
+        (constDate "2016-02-08 00:00:00", Just Green),
+        (constDate "2016-02-09 00:00:00", Just Green),
         (constDate "2016-02-10 00:00:00", Just Yellow)
       ]
     },
     {
       label = "Exercise",
       zones = [
-        (constDate "2016-02-10 00:00:00", Just Green),
-        (constDate "2016-02-10 00:00:00", Just Green),
-        (constDate "2016-02-10 00:00:00", Just Green),
-        (constDate "2016-02-10 00:00:00", Just Yellow),
-        (constDate "2016-02-10 00:00:00", Just Yellow),
+        (constDate "2016-02-05 00:00:00", Just Green),
+        (constDate "2016-02-06 00:00:00", Just Green),
+        (constDate "2016-02-07 00:00:00", Just Green),
+        (constDate "2016-02-08 00:00:00", Just Yellow),
+        (constDate "2016-02-09 00:00:00", Just Yellow),
         (constDate "2016-02-10 00:00:00", Just Red)
       ]
     }
@@ -68,7 +68,15 @@ viewHabit address model =
   Habit.view (Signal.forwardTo address <| Rotate model.label) model
 
 update : Action -> List Habit.Model -> List Habit.Model
-update action habits = habits
+update (Rotate habitLabel habitAction) habits =
+  let
+    updateHabit : Habit.Model -> Habit.Model
+    updateHabit habit =
+      if habitLabel == habit.label
+      then Habit.update habitAction habit
+      else habit
+  in
+    List.map updateHabit habits
 
 main : Signal Html
 main =

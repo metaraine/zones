@@ -86,7 +86,7 @@ view address { date, daysToShow, habitRecords } =
 toHabitList : List Date -> List HabitRecord -> List Habit.Model
 toHabitList dates habitRecords =
   let
-    firstDate = Maybe.withDefault (fromTime 0) List.head dates
+    firstDate = Maybe.withDefault (fromTime 0) <| List.head dates
 
     findZone : List Checkin -> Int -> Int -> Date -> Maybe Color
     findZone checkins decayRate decay date =

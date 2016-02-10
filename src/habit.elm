@@ -45,13 +45,15 @@ viewZone address (date, colorOrNot) =
   Zone.view (Signal.forwardTo address <| Rotate date) colorOrNot
 
 update : Action -> Model -> Model
-update (Rotate date action) { label, zones } =
+update (Rotate date zoneAction) { label, zones } =
   let
     updateZone : (Date, Maybe Color) -> (Date, Maybe Color)
     updateZone (zoneDate, colorOrNot) =
-      if dateEquals zoneDate date
-      then (zoneDate, Zone.update action colorOrNot)
-      else (zoneDate, colorOrNot)
+      (zoneDate,
+        if dateEquals zoneDate date
+        then Zone.update zoneAction colorOrNot
+        else colorOrNot
+      )
   in
     {
       label = label,

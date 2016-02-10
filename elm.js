@@ -11063,7 +11063,7 @@ Elm.Habit.make = function (_elm) {
          var _p5 = _p4;
          var _p7 = _p5._0;
          var _p6 = _p5._1;
-         return A2($DateUtil.dateEquals,_p7,_p2._0) ? {ctor: "_Tuple2",_0: _p7,_1: A2($Zone.update,_p2._1,_p6)} : {ctor: "_Tuple2",_0: _p7,_1: _p6};
+         return {ctor: "_Tuple2",_0: _p7,_1: A2($DateUtil.dateEquals,_p7,_p2._0) ? A2($Zone.update,_p2._1,_p6) : _p6};
       };
       return {label: _p3.label,zones: A2($List.map,updateZone,_p3.zones)};
    });
@@ -11098,4 +11098,226 @@ Elm.Habit.make = function (_elm) {
                               ,update: update
                               ,main: main
                               ,labelStyle: labelStyle};
+};
+Elm.HabitList = Elm.HabitList || {};
+Elm.HabitList.make = function (_elm) {
+   "use strict";
+   _elm.HabitList = _elm.HabitList || {};
+   if (_elm.HabitList.values) return _elm.HabitList.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $DateUtil = Elm.DateUtil.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Habit = Elm.Habit.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $StartApp$Simple = Elm.StartApp.Simple.make(_elm),
+   $Zone = Elm.Zone.make(_elm);
+   var _op = {};
+   var update = F2(function (_p0,habits) {
+      var _p1 = _p0;
+      var updateHabit = function (habit) {    return _U.eq(_p1._0,habit.label) ? A2($Habit.update,_p1._1,habit) : habit;};
+      return A2($List.map,updateHabit,habits);
+   });
+   var model = _U.list([{label: "Sleep"
+                        ,zones: _U.list([{ctor: "_Tuple2",_0: $DateUtil.constDate("2016-02-05 00:00:00"),_1: $Maybe.Nothing}
+                                        ,{ctor: "_Tuple2",_0: $DateUtil.constDate("2016-02-06 00:00:00"),_1: $Maybe.Just($Zone.Red)}
+                                        ,{ctor: "_Tuple2",_0: $DateUtil.constDate("2016-02-07 00:00:00"),_1: $Maybe.Just($Zone.Yellow)}
+                                        ,{ctor: "_Tuple2",_0: $DateUtil.constDate("2016-02-08 00:00:00"),_1: $Maybe.Just($Zone.Green)}
+                                        ,{ctor: "_Tuple2",_0: $DateUtil.constDate("2016-02-09 00:00:00"),_1: $Maybe.Just($Zone.Green)}
+                                        ,{ctor: "_Tuple2",_0: $DateUtil.constDate("2016-02-10 00:00:00"),_1: $Maybe.Just($Zone.Green)}])}
+                       ,{label: "Diet"
+                        ,zones: _U.list([{ctor: "_Tuple2",_0: $DateUtil.constDate("2016-02-05 00:00:00"),_1: $Maybe.Just($Zone.Red)}
+                                        ,{ctor: "_Tuple2",_0: $DateUtil.constDate("2016-02-06 00:00:00"),_1: $Maybe.Just($Zone.Red)}
+                                        ,{ctor: "_Tuple2",_0: $DateUtil.constDate("2016-02-07 00:00:00"),_1: $Maybe.Just($Zone.Yellow)}
+                                        ,{ctor: "_Tuple2",_0: $DateUtil.constDate("2016-02-08 00:00:00"),_1: $Maybe.Just($Zone.Yellow)}
+                                        ,{ctor: "_Tuple2",_0: $DateUtil.constDate("2016-02-09 00:00:00"),_1: $Maybe.Just($Zone.Green)}
+                                        ,{ctor: "_Tuple2",_0: $DateUtil.constDate("2016-02-10 00:00:00"),_1: $Maybe.Just($Zone.Yellow)}])}
+                       ,{label: "Meditation"
+                        ,zones: _U.list([{ctor: "_Tuple2",_0: $DateUtil.constDate("2016-02-05 00:00:00"),_1: $Maybe.Nothing}
+                                        ,{ctor: "_Tuple2",_0: $DateUtil.constDate("2016-02-06 00:00:00"),_1: $Maybe.Just($Zone.Red)}
+                                        ,{ctor: "_Tuple2",_0: $DateUtil.constDate("2016-02-07 00:00:00"),_1: $Maybe.Just($Zone.Yellow)}
+                                        ,{ctor: "_Tuple2",_0: $DateUtil.constDate("2016-02-08 00:00:00"),_1: $Maybe.Just($Zone.Green)}
+                                        ,{ctor: "_Tuple2",_0: $DateUtil.constDate("2016-02-09 00:00:00"),_1: $Maybe.Just($Zone.Green)}
+                                        ,{ctor: "_Tuple2",_0: $DateUtil.constDate("2016-02-10 00:00:00"),_1: $Maybe.Just($Zone.Yellow)}])}
+                       ,{label: "Exercise"
+                        ,zones: _U.list([{ctor: "_Tuple2",_0: $DateUtil.constDate("2016-02-05 00:00:00"),_1: $Maybe.Just($Zone.Green)}
+                                        ,{ctor: "_Tuple2",_0: $DateUtil.constDate("2016-02-06 00:00:00"),_1: $Maybe.Just($Zone.Green)}
+                                        ,{ctor: "_Tuple2",_0: $DateUtil.constDate("2016-02-07 00:00:00"),_1: $Maybe.Just($Zone.Green)}
+                                        ,{ctor: "_Tuple2",_0: $DateUtil.constDate("2016-02-08 00:00:00"),_1: $Maybe.Just($Zone.Yellow)}
+                                        ,{ctor: "_Tuple2",_0: $DateUtil.constDate("2016-02-09 00:00:00"),_1: $Maybe.Just($Zone.Yellow)}
+                                        ,{ctor: "_Tuple2",_0: $DateUtil.constDate("2016-02-10 00:00:00"),_1: $Maybe.Just($Zone.Red)}])}]);
+   var Rotate = F2(function (a,b) {    return {ctor: "Rotate",_0: a,_1: b};});
+   var viewHabit = F2(function (address,model) {    return A2($Habit.view,A2($Signal.forwardTo,address,Rotate(model.label)),model);});
+   var view = F2(function (address,habits) {    return A2($Html.div,_U.list([]),A2($List.map,viewHabit(address),habits));});
+   var main = $StartApp$Simple.start({model: model,update: update,view: view});
+   return _elm.HabitList.values = {_op: _op,Rotate: Rotate,model: model,view: view,viewHabit: viewHabit,update: update,main: main};
+};
+Elm.HabitChart = Elm.HabitChart || {};
+Elm.HabitChart.make = function (_elm) {
+   "use strict";
+   _elm.HabitChart = _elm.HabitChart || {};
+   if (_elm.HabitChart.values) return _elm.HabitChart.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Date = Elm.Date.make(_elm),
+   $Date$Compare = Elm.Date.Compare.make(_elm),
+   $Date$Period = Elm.Date.Period.make(_elm),
+   $DateUtil = Elm.DateUtil.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Habit = Elm.Habit.make(_elm),
+   $HabitList = Elm.HabitList.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $String = Elm.String.make(_elm),
+   $Time = Elm.Time.make(_elm),
+   $Zone = Elm.Zone.make(_elm);
+   var _op = {};
+   var headerCellLightStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "font-family",_1: "Helvetica Neue"}
+                                                             ,{ctor: "_Tuple2",_0: "font-weight",_1: "400"}
+                                                             ,{ctor: "_Tuple2",_0: "font-size",_1: "12px"}
+                                                             ,{ctor: "_Tuple2",_0: "display",_1: "inline-block"}
+                                                             ,{ctor: "_Tuple2",_0: "width",_1: "20px"}
+                                                             ,{ctor: "_Tuple2",_0: "height",_1: "20px"}
+                                                             ,{ctor: "_Tuple2",_0: "text-align",_1: "center"}
+                                                             ,{ctor: "_Tuple2",_0: "color",_1: "hsl(0, 0%, 80%)"}]));
+   var headerCellStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "font-family",_1: "Helvetica Neue"}
+                                                        ,{ctor: "_Tuple2",_0: "font-weight",_1: "400"}
+                                                        ,{ctor: "_Tuple2",_0: "font-size",_1: "12px"}
+                                                        ,{ctor: "_Tuple2",_0: "display",_1: "inline-block"}
+                                                        ,{ctor: "_Tuple2",_0: "width",_1: "20px"}
+                                                        ,{ctor: "_Tuple2",_0: "height",_1: "20px"}
+                                                        ,{ctor: "_Tuple2",_0: "text-align",_1: "center"}]));
+   var labelStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "font-family",_1: "Helvetica Neue"}
+                                                   ,{ctor: "_Tuple2",_0: "font-weight",_1: "400"}
+                                                   ,{ctor: "_Tuple2",_0: "font-size",_1: "14px"}
+                                                   ,{ctor: "_Tuple2",_0: "width",_1: "120px"}
+                                                   ,{ctor: "_Tuple2",_0: "display",_1: "inline-block"}
+                                                   ,{ctor: "_Tuple2",_0: "vertical-align",_1: "top"}
+                                                   ,{ctor: "_Tuple2",_0: "margin-right",_1: "25px"}
+                                                   ,{ctor: "_Tuple2",_0: "text-align",_1: "right"}
+                                                   ,{ctor: "_Tuple2",_0: "line-height",_1: "22px"}
+                                                   ,{ctor: "_Tuple2",_0: "text-transform",_1: "uppercase"}]));
+   var update = F2(function (action,model) {
+      var _p0 = action;
+      switch (_p0.ctor)
+      {case "NoOp": return model;
+         case "Rotate": return model;
+         default: return _U.update(model,{date: _p0._0});}
+   });
+   var viewHeaderCell = function (date) {    return A2($Html.span,_U.list([headerCellStyle]),_U.list([$Html.text($Basics.toString($Date.day(date)))]));};
+   var viewHeaderDayCell = function (date) {
+      return A2($Html.span,_U.list([headerCellLightStyle]),_U.list([$Html.text(A2($String.left,2,$Basics.toString($Date.dayOfWeek(date))))]));
+   };
+   var viewHeaderMonthCell = function (date) {
+      return A2($Html.span,_U.list([headerCellStyle]),_U.list([$Html.text(_U.eq($Date.day(date),1) ? $DateUtil.showFullMonth(date) : "")]));
+   };
+   var viewHeaderRow = F2(function (dates,viewCell) {
+      return A2($Html.div,_U.list([]),_U.list([A2($Html.span,_U.list([labelStyle]),_U.list([])),A2($Html.span,_U.list([]),A2($List.map,viewCell,dates))]));
+   });
+   var decayStep = function (color) {    var _p1 = color;if (_p1.ctor === "Green") {    return $Zone.Yellow;} else {    return $Zone.Red;}};
+   var decayZone = F3(function (decayRate,decay,color) {    return _U.eq(decayRate,0) ? $Zone.Red : _U.cmp(decay,decayRate) < 0 ? color : decayStep(color);});
+   var toHabitList = F2(function (dates,habitRecords) {
+      var firstDate = A2($Maybe.withDefault,$Date.fromTime(0),$List.head(dates));
+      var findZone = F4(function (checkins,decayRate,decay,date) {
+         var searchCheckin = $List.head(A2($List.filter,
+         function (_p2) {
+            return A2($DateUtil.dateEquals,date,function (_) {    return _.date;}(_p2));
+         },
+         checkins));
+         var _p3 = searchCheckin;
+         if (_p3.ctor === "Just") {
+               return $Maybe.Just(_p3._0.color);
+            } else {
+               if (A3($Date$Compare.is,$Date$Compare.SameOrAfter,date,firstDate)) {
+                     var nextDecay = A2($Basics._op["%"],decay + 1,_U.eq(decayRate,0) ? 1 : decayRate);
+                     var zone = A4(findZone,checkins,decayRate,nextDecay,A3($Date$Period.add,$Date$Period.Day,-1,date));
+                     return A2($Maybe.map,A2(decayZone,decayRate,decay + 1),zone);
+                  } else return $Maybe.Nothing;
+            }
+      });
+      var toHabit = function (_p4) {
+         var _p5 = _p4;
+         return {label: _p5.label
+                ,zones: A2($List.map,function (date) {    return {ctor: "_Tuple2",_0: date,_1: A4(findZone,_p5.checkins,_p5.decayRate,0,date)};},dates)};
+      };
+      return A2($List.map,toHabit,habitRecords);
+   });
+   var startModel = {habitRecords: _U.list([{label: "Sleep"
+                                            ,decayRate: 2
+                                            ,checkins: _U.list([{date: $DateUtil.constDate("2016-01-28 00:00:00"),color: $Zone.Green}
+                                                               ,{date: $DateUtil.constDate("2016-02-04 00:00:00"),color: $Zone.Green}
+                                                               ,{date: $DateUtil.constDate("2016-02-09 00:00:00"),color: $Zone.Green}])}])
+                    ,date: $Date.fromTime(0)
+                    ,daysToShow: 14};
+   var Tick = function (a) {    return {ctor: "Tick",_0: a};};
+   var clock = A2($Signal.map,function (_p6) {    return Tick($Date.fromTime(_p6));},$Time.every($Time.second));
+   var Rotate = function (a) {    return {ctor: "Rotate",_0: a};};
+   var NoOp = {ctor: "NoOp"};
+   var actions = $Signal.mailbox(NoOp);
+   var model = A3($Signal.foldp,update,startModel,A2($Signal.merge,actions.signal,clock));
+   var view = F2(function (address,_p7) {
+      var _p8 = _p7;
+      var dates = A2($DateUtil.listOfDates,_p8.date,_p8.daysToShow);
+      return A2($Html.div,
+      _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "margin-top",_1: "25px"},{ctor: "_Tuple2",_0: "margin-left",_1: "25px"}]))]),
+      _U.list([A2(viewHeaderRow,dates,viewHeaderDayCell)
+              ,A2(viewHeaderRow,dates,viewHeaderCell)
+              ,A2($HabitList.view,A2($Signal.forwardTo,address,$Basics.always(NoOp)),A2(toHabitList,dates,_p8.habitRecords))]));
+   });
+   var Checkin = F2(function (a,b) {    return {date: a,color: b};});
+   var HabitRecord = F3(function (a,b,c) {    return {label: a,decayRate: b,checkins: c};});
+   var Model = F3(function (a,b,c) {    return {habitRecords: a,date: b,daysToShow: c};});
+   return _elm.HabitChart.values = {_op: _op
+                                   ,Model: Model
+                                   ,HabitRecord: HabitRecord
+                                   ,Checkin: Checkin
+                                   ,NoOp: NoOp
+                                   ,Rotate: Rotate
+                                   ,Tick: Tick
+                                   ,startModel: startModel
+                                   ,actions: actions
+                                   ,model: model
+                                   ,clock: clock
+                                   ,view: view
+                                   ,toHabitList: toHabitList
+                                   ,decayZone: decayZone
+                                   ,decayStep: decayStep
+                                   ,viewHeaderRow: viewHeaderRow
+                                   ,viewHeaderMonthCell: viewHeaderMonthCell
+                                   ,viewHeaderDayCell: viewHeaderDayCell
+                                   ,viewHeaderCell: viewHeaderCell
+                                   ,update: update
+                                   ,labelStyle: labelStyle
+                                   ,headerCellStyle: headerCellStyle
+                                   ,headerCellLightStyle: headerCellLightStyle};
+};
+Elm.Main = Elm.Main || {};
+Elm.Main.make = function (_elm) {
+   "use strict";
+   _elm.Main = _elm.Main || {};
+   if (_elm.Main.values) return _elm.Main.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $HabitChart = Elm.HabitChart.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var model = $HabitChart.model;
+   var NoOp = {ctor: "NoOp"};
+   var actions = $Signal.mailbox(NoOp);
+   var view = F2(function (address,model) {    return A2($HabitChart.view,A2($Signal.forwardTo,address,$Basics.always(NoOp)),model);});
+   var main = A2($Signal.map,view(actions.address),model);
+   return _elm.Main.values = {_op: _op,NoOp: NoOp,model: model,actions: actions,main: main,view: view};
 };
