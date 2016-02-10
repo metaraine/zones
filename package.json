@@ -1,0 +1,30 @@
+{
+  "name": "zones",
+  "version": "0.1.0",
+  "description": "A time-decay habit tracker written in Elm",
+  "main": "app.js",
+  "scripts": {
+    "postinstall": "elm make src/main.elm",
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/metaraine/zones.git"
+  },
+  "keywords": [
+    "elm",
+    "habit",
+    "tracker"
+  ],
+  "author": "metaraine",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/metaraine/zones/issues"
+  },
+  "homepage": "https://github.com/metaraine/zones#readme",
+  "dependencies": {
+    "express": "^4.13.4",
+    "elm": "0.16.0"
+  }
+}
