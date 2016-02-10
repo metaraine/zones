@@ -11209,7 +11209,11 @@ Elm.HabitChart.make = function (_elm) {
       var _p0 = action;
       switch (_p0.ctor)
       {case "NoOp": return model;
-         case "Rotate": return model;
+         case "Rotate": var updateCheckin = function (checkin) {
+              return A2($DateUtil.dateEquals,_p0._0._1._0,checkin.date) ? {date: checkin.date,color: $Zone.rotateColor(checkin.color)} : checkin;
+           };
+           var updateRecord = function (habitRecord) {    return _U.update(habitRecord,{checkins: A2($List.map,updateCheckin,habitRecord.checkins)});};
+           return _U.update(model,{habitRecords: A2($List.map,updateRecord,model.habitRecords)});
          default: return _U.update(model,{date: _p0._0});}
    });
    var viewHeaderCell = function (date) {    return A2($Html.span,_U.list([headerCellStyle]),_U.list([$Html.text($Basics.toString($Date.day(date)))]));};
@@ -11260,9 +11264,6 @@ Elm.HabitChart.make = function (_elm) {
    var Tick = function (a) {    return {ctor: "Tick",_0: a};};
    var clock = A2($Signal.map,function (_p6) {    return Tick($Date.fromTime(_p6));},$Time.every($Time.second));
    var Rotate = function (a) {    return {ctor: "Rotate",_0: a};};
-   var NoOp = {ctor: "NoOp"};
-   var actions = $Signal.mailbox(NoOp);
-   var model = A3($Signal.foldp,update,startModel,A2($Signal.merge,actions.signal,clock));
    var view = F2(function (address,_p7) {
       var _p8 = _p7;
       var dates = A2($DateUtil.listOfDates,_p8.date,_p8.daysToShow);
@@ -11270,8 +11271,12 @@ Elm.HabitChart.make = function (_elm) {
       _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "margin-top",_1: "25px"},{ctor: "_Tuple2",_0: "margin-left",_1: "25px"}]))]),
       _U.list([A2(viewHeaderRow,dates,viewHeaderDayCell)
               ,A2(viewHeaderRow,dates,viewHeaderCell)
-              ,A2($HabitList.view,A2($Signal.forwardTo,address,$Basics.always(NoOp)),A2(toHabitList,dates,_p8.habitRecords))]));
+              ,A2($HabitList.view,A2($Signal.forwardTo,address,Rotate),A2(toHabitList,dates,_p8.habitRecords))]));
    });
+   var NoOp = {ctor: "NoOp"};
+   var actions = $Signal.mailbox(NoOp);
+   var model = A3($Signal.foldp,update,startModel,A2($Signal.merge,actions.signal,clock));
+   var main = A2($Signal.map,view(actions.address),model);
    var Checkin = F2(function (a,b) {    return {date: a,color: b};});
    var HabitRecord = F3(function (a,b,c) {    return {label: a,decayRate: b,checkins: c};});
    var Model = F3(function (a,b,c) {    return {habitRecords: a,date: b,daysToShow: c};});
@@ -11297,7 +11302,8 @@ Elm.HabitChart.make = function (_elm) {
                                    ,update: update
                                    ,labelStyle: labelStyle
                                    ,headerCellStyle: headerCellStyle
-                                   ,headerCellLightStyle: headerCellLightStyle};
+                                   ,headerCellLightStyle: headerCellLightStyle
+                                   ,main: main};
 };
 Elm.Main = Elm.Main || {};
 Elm.Main.make = function (_elm) {
@@ -11308,16 +11314,11 @@ Elm.Main.make = function (_elm) {
    $Basics = Elm.Basics.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $HabitChart = Elm.HabitChart.make(_elm),
-   $Html = Elm.Html.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
-   var model = $HabitChart.model;
-   var NoOp = {ctor: "NoOp"};
-   var actions = $Signal.mailbox(NoOp);
-   var view = F2(function (address,model) {    return A2($HabitChart.view,A2($Signal.forwardTo,address,$Basics.always(NoOp)),model);});
-   var main = A2($Signal.map,view(actions.address),model);
-   return _elm.Main.values = {_op: _op,NoOp: NoOp,model: model,actions: actions,main: main,view: view};
+   var main = $HabitChart.main;
+   return _elm.Main.values = {_op: _op,main: main};
 };

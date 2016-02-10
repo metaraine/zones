@@ -32,7 +32,7 @@ type alias Checkin = {
 
 type Action =
   NoOp
-  | Rotate Date
+  | Rotate HabitList.Action
   | Tick Date
 
 -- Needed for foldp but not used (http://stackoverflow.com/a/34095298/480608)
@@ -80,7 +80,7 @@ view address { date, daysToShow, habitRecords } =
       --viewHeaderRow model.date model.daysToShow viewHeaderMonthCell,
       viewHeaderRow dates viewHeaderDayCell,
       viewHeaderRow dates viewHeaderCell,
-      HabitList.view (Signal.forwardTo address <| always NoOp) (toHabitList dates habitRecords)
+      HabitList.view (Signal.forwardTo address Rotate) (toHabitList dates habitRecords)
     ]
 
 toHabitList : List Date -> List HabitRecord -> List Habit.Model
@@ -147,7 +147,26 @@ update : Action -> Model -> Model
 update action model =
   case action of
     NoOp -> model
-    Rotate date -> model
+    Rotate (HabitList.Rotate label (Habit.Rotate zoneDate zoneAction)) ->
+      let
+        updateCheckin : Checkin -> Checkin
+        updateCheckin checkin =
+          if dateEquals zoneDate checkin.date
+          then {
+            date = checkin.date,
+            color = Zone.rotateColor checkin.color
+          }
+          else checkin
+
+        updateRecord : HabitRecord -> HabitRecord
+        updateRecord habitRecord =
+          { habitRecord |
+            checkins = List.map updateCheckin habitRecord.checkins
+          }
+      in
+        { model |
+          habitRecords = List.map updateRecord model.habitRecords
+        }
     Tick date -> { model | date = date }
 
 labelStyle : Attribute
@@ -186,3 +205,8 @@ headerCellLightStyle = style [
     ("text-align", "center"),
     ("color", "hsl(0, 0%, 80%)")
   ]
+
+main : Signal Html
+main =
+  Signal.map (view actions.address) model
+
