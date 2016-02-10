@@ -6,14 +6,18 @@ import Html.Events exposing (onClick)
 
 type Color = Red | Yellow | Green
 
-type Model = Empty
-  | Active Color
-  | Decaying Color
-
 type Action = Rotate
 
+type alias Model = Maybe {
+  color: Color,
+  faded: Bool
+}
+
 model : Model
-model = Active Red
+model = Just {
+    color = Green,
+    faded = False
+  }
 
 colorToHex : Color -> String
 colorToHex color =
@@ -26,17 +30,15 @@ zoneStyle : Model -> Attribute
 zoneStyle model =
   style
     [ ("background-color", case model of
-        Empty -> "white"
-        Active color -> colorToHex color
-        Decaying color -> colorToHex color
-      )
+      Just { color } -> colorToHex color
+      Nothing -> "transparent")
     , ("display", "inline-block")
     , ("width", "20px")
     , ("height", "20px")
     , ("opacity", case model of
-      Decaying _ -> "0.2"
-      _ -> "1.0"
-    )]
+      Just { faded } -> if faded then "0.3" else "1.0"
+      Nothing -> "1.0")
+    ]
 
 view : Signal.Address Action -> Model -> Html
 view address model =

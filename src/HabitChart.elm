@@ -38,8 +38,8 @@ startModel = {
         label = "Sleep",
         decayRate = 2,
         checkins = [{
-          date = constDate "2016-02-01 00:00:00",
-          color = Yellow
+          date = constDate "2016-01-28 00:00:00",
+          color = Green
         },{
           date = constDate "2016-02-04 00:00:00",
           color = Green
@@ -50,7 +50,7 @@ startModel = {
       }
     ],
     date = fromTime 0,
-    daysToShow = 10
+    daysToShow = 14
   }
 
 constDate : String -> Date
@@ -97,20 +97,21 @@ toHabitList dates habitRecords =
       Just date -> date
       Nothing -> fromTime 0
 
-    findZone : List Checkin -> Int -> Int -> Date -> Zone.Model
+    findZone : List Checkin -> Int -> Int -> Date -> Maybe Color
     findZone checkins decayRate decay date =
       let
         searchCheckin = List.head <| List.filter (dateEquals date << .date) checkins
       in
         case searchCheckin of
-          Just { color } -> Zone.Active color
+          Just { color } -> Just color
           Nothing -> if is Compare.SameOrAfter date firstDate
-            -- TODO: Why does this pass Empty to decayZone on the second recursive call?
-            then case findZone checkins decayRate (decay + 1) (Period.add Period.Day -1 date) of
-              Zone.Active color -> decayZone decayRate decay color
-              Zone.Decaying color -> decayZone decayRate decay color
-              Zone.Empty -> Zone.Empty
-            else Zone.Empty
+            then
+              let
+                nextDecay = (decay + 1) % (if decayRate == 0 then 1 else decayRate)
+                zone = findZone checkins decayRate nextDecay <| Period.add Period.Day -1 date
+              in
+                Maybe.map (decayZone decayRate (decay+1)) zone
+            else Nothing
 
     toHabit : HabitRecord -> Habit.Model
     toHabit { label, decayRate, checkins } = {
@@ -120,12 +121,17 @@ toHabitList dates habitRecords =
   in
     List.map toHabit habitRecords
 
-decayZone : Int -> Int -> Color -> Zone.Model
+decayZone : Int -> Int -> Color -> Color
 decayZone decayRate decay color =
+  if decayRate == 0 then Red
+  else if decay < decayRate then color
+  else decayStep color
+
+decayStep : Color -> Color
+decayStep color =
   case color of
-    Green -> if decay < decayRate then Zone.Active Green else Zone.Active Yellow
-    Yellow -> if decay < decayRate then Zone.Active Yellow else Zone.Active Red
-    Red -> Zone.Active Red
+    Green -> Yellow
+    _ -> Red
 
 -- Gets a list of n days up to the given date
 listOfDates : Date -> Int -> List Date

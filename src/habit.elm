@@ -1,41 +1,47 @@
 module Habit where
 
-import Zone exposing (update, view)
+import Zone exposing (update, view, Color(..))
 import Html exposing (..)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
 
-type alias Model = { label: String, zones: List Zone.Model }
+type alias Model = {
+  label: String,
+  zones: List (Maybe Color)
+}
 
 type Action = Something
 
 model : Model
-model = { label = "Meditation", zones = [
-    Zone.Empty,
-    Zone.Empty,
-    Zone.Decaying Zone.Red,
-    Zone.Decaying Zone.Red,
-    Zone.Decaying Zone.Yellow,
-    Zone.Decaying Zone.Yellow,
-    Zone.Decaying Zone.Green,
-    Zone.Active Zone.Green,
-    Zone.Active Zone.Green,
-    Zone.Active Zone.Yellow,
-    Zone.Active Zone.Red
-  ]}
+model = {
+    label = "Meditation",
+    zones = [
+      Nothing,
+      Nothing,
+      Just Red,
+      Just Red,
+      Just Yellow,
+      Just Yellow,
+      Just Green,
+      Just Green,
+      Just Green,
+      Just Yellow,
+      Just Red
+    ]
+  }
 
 view : Signal.Address Zone.Action -> Model -> Html
-view address model =
+view address { label, zones } =
   div [] [
-    span [ labelStyle ] [ text model.label ],
-    span [] (List.map (Zone.view address) model.zones)
+    span [ labelStyle ] [ text label ],
+    span [] <| List.map (Zone.view address << toZone) zones
   ]
 
---viewZone : Signal.Address Action -> Zone.Model -> Html
---viewZone address zoneModel =
---  Zone.view address zoneModel
+toZone : Maybe Color -> Zone.Model
+toZone =
+  Maybe.map (\c -> { color = c, faded = False } )
 
-update : Zone.Action -> Model -> Model
+update : Action -> Model -> Model
 update action model = model
 
 labelStyle : Attribute

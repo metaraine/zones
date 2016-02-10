@@ -10581,10 +10581,11 @@ Elm.Zone.make = function (_elm) {
                                              ,_0: "background-color"
                                              ,_1: function () {
                                                 var _p1 = model;
-                                                switch (_p1.ctor)
-                                                {case "Empty": return "white";
-                                                   case "Active": return colorToHex(_p1._0);
-                                                   default: return colorToHex(_p1._0);}
+                                                if (_p1.ctor === "Just") {
+                                                      return colorToHex(_p1._0.color);
+                                                   } else {
+                                                      return "transparent";
+                                                   }
                                              }()}
                                             ,{ctor: "_Tuple2",_0: "display",_1: "inline-block"}
                                             ,{ctor: "_Tuple2",_0: "width",_1: "20px"}
@@ -10593,8 +10594,8 @@ Elm.Zone.make = function (_elm) {
                                              ,_0: "opacity"
                                              ,_1: function () {
                                                 var _p2 = model;
-                                                if (_p2.ctor === "Decaying") {
-                                                      return "0.2";
+                                                if (_p2.ctor === "Just") {
+                                                      return _p2._0.faded ? "0.3" : "1.0";
                                                    } else {
                                                       return "1.0";
                                                    }
@@ -10602,20 +10603,14 @@ Elm.Zone.make = function (_elm) {
    };
    var Rotate = {ctor: "Rotate"};
    var view = F2(function (address,model) {    return A2($Html.span,_U.list([A2($Html$Events.onClick,address,Rotate),zoneStyle(model)]),_U.list([]));});
-   var Decaying = function (a) {    return {ctor: "Decaying",_0: a};};
-   var Active = function (a) {    return {ctor: "Active",_0: a};};
-   var Empty = {ctor: "Empty"};
    var Green = {ctor: "Green"};
+   var model = $Maybe.Just({color: Green,faded: false});
    var Yellow = {ctor: "Yellow"};
    var Red = {ctor: "Red"};
-   var model = Active(Red);
    return _elm.Zone.values = {_op: _op
                              ,Red: Red
                              ,Yellow: Yellow
                              ,Green: Green
-                             ,Empty: Empty
-                             ,Active: Active
-                             ,Decaying: Decaying
                              ,Rotate: Rotate
                              ,model: model
                              ,colorToHex: colorToHex
@@ -10650,27 +10645,29 @@ Elm.Habit.make = function (_elm) {
                                                    ,{ctor: "_Tuple2",_0: "line-height",_1: "22px"}
                                                    ,{ctor: "_Tuple2",_0: "text-transform",_1: "uppercase"}]));
    var update = F2(function (action,model) {    return model;});
-   var view = F2(function (address,model) {
+   var toZone = $Maybe.map(function (c) {    return {color: c,faded: false};});
+   var view = F2(function (address,_p0) {
+      var _p1 = _p0;
       return A2($Html.div,
       _U.list([]),
-      _U.list([A2($Html.span,_U.list([labelStyle]),_U.list([$Html.text(model.label)]))
-              ,A2($Html.span,_U.list([]),A2($List.map,$Zone.view(address),model.zones))]));
+      _U.list([A2($Html.span,_U.list([labelStyle]),_U.list([$Html.text(_p1.label)]))
+              ,A2($Html.span,_U.list([]),A2($List.map,function (_p2) {    return A2($Zone.view,address,toZone(_p2));},_p1.zones))]));
    });
    var model = {label: "Meditation"
-               ,zones: _U.list([$Zone.Empty
-                               ,$Zone.Empty
-                               ,$Zone.Decaying($Zone.Red)
-                               ,$Zone.Decaying($Zone.Red)
-                               ,$Zone.Decaying($Zone.Yellow)
-                               ,$Zone.Decaying($Zone.Yellow)
-                               ,$Zone.Decaying($Zone.Green)
-                               ,$Zone.Active($Zone.Green)
-                               ,$Zone.Active($Zone.Green)
-                               ,$Zone.Active($Zone.Yellow)
-                               ,$Zone.Active($Zone.Red)])};
+               ,zones: _U.list([$Maybe.Nothing
+                               ,$Maybe.Nothing
+                               ,$Maybe.Just($Zone.Red)
+                               ,$Maybe.Just($Zone.Red)
+                               ,$Maybe.Just($Zone.Yellow)
+                               ,$Maybe.Just($Zone.Yellow)
+                               ,$Maybe.Just($Zone.Green)
+                               ,$Maybe.Just($Zone.Green)
+                               ,$Maybe.Just($Zone.Green)
+                               ,$Maybe.Just($Zone.Yellow)
+                               ,$Maybe.Just($Zone.Red)])};
    var Something = {ctor: "Something"};
    var Model = F2(function (a,b) {    return {label: a,zones: b};});
-   return _elm.Habit.values = {_op: _op,Model: Model,Something: Something,model: model,view: view,update: update,labelStyle: labelStyle};
+   return _elm.Habit.values = {_op: _op,Model: Model,Something: Something,model: model,view: view,toZone: toZone,update: update,labelStyle: labelStyle};
 };
 Elm.HabitList = Elm.HabitList || {};
 Elm.HabitList.make = function (_elm) {
@@ -10691,33 +10688,33 @@ Elm.HabitList.make = function (_elm) {
    var update = F2(function (action,model) {    return model;});
    var view = F2(function (address,model) {    return A2($Html.div,_U.list([]),A2($List.map,$Habit.view(address),model));});
    var model = _U.list([{label: "Sleep"
-                        ,zones: _U.list([$Zone.Empty
-                                        ,$Zone.Active($Zone.Red)
-                                        ,$Zone.Active($Zone.Yellow)
-                                        ,$Zone.Active($Zone.Green)
-                                        ,$Zone.Active($Zone.Green)
-                                        ,$Zone.Decaying($Zone.Green)])}
+                        ,zones: _U.list([$Maybe.Nothing
+                                        ,$Maybe.Just($Zone.Red)
+                                        ,$Maybe.Just($Zone.Yellow)
+                                        ,$Maybe.Just($Zone.Green)
+                                        ,$Maybe.Just($Zone.Green)
+                                        ,$Maybe.Just($Zone.Green)])}
                        ,{label: "Diet"
-                        ,zones: _U.list([$Zone.Active($Zone.Red)
-                                        ,$Zone.Active($Zone.Red)
-                                        ,$Zone.Active($Zone.Yellow)
-                                        ,$Zone.Active($Zone.Yellow)
-                                        ,$Zone.Active($Zone.Green)
-                                        ,$Zone.Decaying($Zone.Yellow)])}
+                        ,zones: _U.list([$Maybe.Just($Zone.Red)
+                                        ,$Maybe.Just($Zone.Red)
+                                        ,$Maybe.Just($Zone.Yellow)
+                                        ,$Maybe.Just($Zone.Yellow)
+                                        ,$Maybe.Just($Zone.Green)
+                                        ,$Maybe.Just($Zone.Yellow)])}
                        ,{label: "Meditation"
-                        ,zones: _U.list([$Zone.Empty
-                                        ,$Zone.Active($Zone.Red)
-                                        ,$Zone.Active($Zone.Yellow)
-                                        ,$Zone.Active($Zone.Green)
-                                        ,$Zone.Active($Zone.Green)
-                                        ,$Zone.Decaying($Zone.Yellow)])}
+                        ,zones: _U.list([$Maybe.Nothing
+                                        ,$Maybe.Just($Zone.Red)
+                                        ,$Maybe.Just($Zone.Yellow)
+                                        ,$Maybe.Just($Zone.Green)
+                                        ,$Maybe.Just($Zone.Green)
+                                        ,$Maybe.Just($Zone.Yellow)])}
                        ,{label: "Exercise"
-                        ,zones: _U.list([$Zone.Active($Zone.Green)
-                                        ,$Zone.Active($Zone.Green)
-                                        ,$Zone.Active($Zone.Green)
-                                        ,$Zone.Active($Zone.Yellow)
-                                        ,$Zone.Active($Zone.Yellow)
-                                        ,$Zone.Decaying($Zone.Red)])}]);
+                        ,zones: _U.list([$Maybe.Just($Zone.Green)
+                                        ,$Maybe.Just($Zone.Green)
+                                        ,$Maybe.Just($Zone.Green)
+                                        ,$Maybe.Just($Zone.Yellow)
+                                        ,$Maybe.Just($Zone.Yellow)
+                                        ,$Maybe.Just($Zone.Red)])}]);
    return _elm.HabitList.values = {_op: _op,model: model,view: view,update: update};
 };
 Elm.Date = Elm.Date || {};
@@ -11141,13 +11138,8 @@ Elm.HabitChart.make = function (_elm) {
    var listOfDates = F2(function (date,days) {
       return A2($List.map,function (n) {    return A3($Date$Period.add,$Date$Period.Day,0 - n,date);},$List.reverse(_U.range(0,days - 1)));
    });
-   var decayZone = F3(function (decayRate,decay,color) {
-      var _p2 = color;
-      switch (_p2.ctor)
-      {case "Green": return _U.cmp(decay,decayRate) < 0 ? $Zone.Active($Zone.Green) : $Zone.Active($Zone.Yellow);
-         case "Yellow": return _U.cmp(decay,decayRate) < 0 ? $Zone.Active($Zone.Yellow) : $Zone.Active($Zone.Red);
-         default: return $Zone.Active($Zone.Red);}
-   });
+   var decayStep = function (color) {    var _p2 = color;if (_p2.ctor === "Green") {    return $Zone.Yellow;} else {    return $Zone.Red;}};
+   var decayZone = F3(function (decayRate,decay,color) {    return _U.eq(decayRate,0) ? $Zone.Red : _U.cmp(decay,decayRate) < 0 ? color : decayStep(color);});
    var dateEquals = F2(function (date1,date2) {
       return _U.eq($Date.year(date1),$Date.year(date2)) && (_U.eq($Date.month(date1),$Date.month(date2)) && _U.eq($Date.day(date1),$Date.day(date2)));
    });
@@ -11157,41 +11149,39 @@ Elm.HabitChart.make = function (_elm) {
          var searchCheckin = $List.head(A2($List.filter,function (_p4) {    return A2(dateEquals,date,function (_) {    return _.date;}(_p4));},checkins));
          var _p5 = searchCheckin;
          if (_p5.ctor === "Just") {
-               return $Zone.Active(_p5._0.color);
+               return $Maybe.Just(_p5._0.color);
             } else {
                if (A3($Date$Compare.is,$Date$Compare.SameOrAfter,date,firstDate)) {
-                     var _p6 = A4(findZone,checkins,decayRate,decay + 1,A3($Date$Period.add,$Date$Period.Day,-1,date));
-                     switch (_p6.ctor)
-                     {case "Active": return A3(decayZone,decayRate,decay,_p6._0);
-                        case "Decaying": return A3(decayZone,decayRate,decay,_p6._0);
-                        default: return $Zone.Empty;}
-                  } else return $Zone.Empty;
+                     var nextDecay = A2($Basics._op["%"],decay + 1,_U.eq(decayRate,0) ? 1 : decayRate);
+                     var zone = A4(findZone,checkins,decayRate,nextDecay,A3($Date$Period.add,$Date$Period.Day,-1,date));
+                     return A2($Maybe.map,A2(decayZone,decayRate,decay + 1),zone);
+                  } else return $Maybe.Nothing;
             }
       });
-      var toHabit = function (_p7) {    var _p8 = _p7;return {label: _p8.label,zones: A2($List.map,A3(findZone,_p8.checkins,_p8.decayRate,0),dates)};};
+      var toHabit = function (_p6) {    var _p7 = _p6;return {label: _p7.label,zones: A2($List.map,A3(findZone,_p7.checkins,_p7.decayRate,0),dates)};};
       return A2($List.map,toHabit,habitRecords);
    });
    var constDate = function (str) {    return A2($Result.withDefault,$Date.fromTime(0),$Date.fromString(str));};
    var startModel = {habitRecords: _U.list([{label: "Sleep"
                                             ,decayRate: 2
-                                            ,checkins: _U.list([{date: constDate("2016-02-01 00:00:00"),color: $Zone.Yellow}
+                                            ,checkins: _U.list([{date: constDate("2016-01-28 00:00:00"),color: $Zone.Green}
                                                                ,{date: constDate("2016-02-04 00:00:00"),color: $Zone.Green}
                                                                ,{date: constDate("2016-02-09 00:00:00"),color: $Zone.Green}])}])
                     ,date: $Date.fromTime(0)
-                    ,daysToShow: 10};
+                    ,daysToShow: 14};
    var Update = function (a) {    return {ctor: "Update",_0: a};};
-   var clock = A2($Signal.map,function (_p9) {    return Update($Date.fromTime(_p9));},$Time.every($Time.second));
+   var clock = A2($Signal.map,function (_p8) {    return Update($Date.fromTime(_p8));},$Time.every($Time.second));
    var NoOp = {ctor: "NoOp"};
    var actions = $Signal.mailbox(NoOp);
    var model = A3($Signal.foldp,update,startModel,A2($Signal.merge,actions.signal,clock));
-   var view = F2(function (address,_p10) {
-      var _p11 = _p10;
-      var dates = A2(listOfDates,_p11.date,_p11.daysToShow);
+   var view = F2(function (address,_p9) {
+      var _p10 = _p9;
+      var dates = A2(listOfDates,_p10.date,_p10.daysToShow);
       return A2($Html.div,
       _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "margin-top",_1: "25px"},{ctor: "_Tuple2",_0: "margin-left",_1: "25px"}]))]),
       _U.list([A2(viewHeaderRow,dates,viewHeaderDayCell)
               ,A2(viewHeaderRow,dates,viewHeaderCell)
-              ,A2($HabitList.view,A2($Signal.forwardTo,address,$Basics.always(NoOp)),A2(toHabitList,dates,_p11.habitRecords))]));
+              ,A2($HabitList.view,A2($Signal.forwardTo,address,$Basics.always(NoOp)),A2(toHabitList,dates,_p10.habitRecords))]));
    });
    var Checkin = F2(function (a,b) {    return {date: a,color: b};});
    var HabitRecord = F3(function (a,b,c) {    return {label: a,decayRate: b,checkins: c};});
@@ -11211,6 +11201,7 @@ Elm.HabitChart.make = function (_elm) {
                                    ,dateEquals: dateEquals
                                    ,toHabitList: toHabitList
                                    ,decayZone: decayZone
+                                   ,decayStep: decayStep
                                    ,listOfDates: listOfDates
                                    ,viewHeaderRow: viewHeaderRow
                                    ,viewHeaderMonthCell: viewHeaderMonthCell
