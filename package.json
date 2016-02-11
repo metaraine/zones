@@ -2,9 +2,7 @@
   "name": "zones",
   "version": "0.1.0",
   "description": "A time-decay habit tracker written in Elm",
-  "main": "app.js",
   "scripts": {
-    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -21,8 +19,5 @@
   "bugs": {
     "url": "https://github.com/metaraine/zones/issues"
   },
-  "homepage": "https://github.com/metaraine/zones#readme",
-  "dependencies": {
-    "express": "^4.13.4"
-  }
+  "homepage": "https://github.com/metaraine/zones#readme"
 }
