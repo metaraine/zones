@@ -2,7 +2,7 @@ module Habit where
 
 import Date exposing (Date)
 import Html exposing (..)
-import Html.Attributes exposing (style)
+import Html.Attributes exposing (style, class)
 import Html.Events exposing (onClick)
 import StartApp.Simple exposing (start)
 import DateUtil exposing (..)
@@ -36,7 +36,7 @@ model = {
 view : Signal.Address Action -> Model -> Html
 view address { label, zones } =
   div [] [
-    span [ labelStyle ] [ text label ],
+    span [ class "habit-label", labelStyle ] [ text label ],
     span [] <| List.map (viewZone address) zones
   ]
 
